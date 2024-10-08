@@ -3,5 +3,5 @@
 ## Instalaciones
 
 - [1. MariaDB](./mysql.md)
-- [2. PostgreSQL](./Instalaciones/Postgres.md)
-- [3. MongoDB](./Instalaciones/mongodb.md)
+- [2. PostgreSQL](./Postgres.md)
+- [3. MongoDB](./mongodb.md)
