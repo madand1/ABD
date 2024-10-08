@@ -29,7 +29,7 @@ sudo systemctl start mariadb
 sudo systemctl enable mariadb
 ```
 
-![Acceso remoto](img/mariadb-inicio.png)
+![Acceso remoto](/Instalaciones/img/mariadb-inicio.png)
 
 ## 3. Acceder a la consola de MariaDB
 
@@ -37,7 +37,7 @@ Cuando ya hemos instaldo podemos entrar a lo que sera la consola de MariaDB con 
 
 ```sudo mysql -u root -p```
 
-![Acceso remoto](img/aceesomysql.png)
+![Acceso remoto](/Instalaciones/img/aceesomysql.png)
 
 ## 4. Configuracion para el acceso remoto
 
@@ -51,7 +51,7 @@ Tenemos que buscar la linea *bind-address* y le añadiremso la siguiente linea:
 
 ```blind-address = 0.0.0.0```
 
-![Acceso remoto](img/accesoremotomysql.png)
+![Acceso remoto](/Instalaciones/img/accesoremotomysql.png)
 
 
 ### Paso b:
