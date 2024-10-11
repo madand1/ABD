@@ -228,45 +228,130 @@ switched to db concesionario
 
 Para ello nos iremos a la maquina virtual donde tenemos todos los clientes a excepción del de oracle, y procederemos a instalar lo siguiente:
 
+1. Importar la clave pública
+
 ```
-andy@cliente-mariadb:~$ echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian bookworm/multiverse amd64/packages/  # MongoDB 6.0" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian bookworm/multiverse amd64/packages/  # MongoDB 6.0
-andy@cliente-mariadb:~$ wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).
-OK
+andy@cliente-mariadb-mongo-postgres:~$ gpg --no-default-keyring --keyring ./mongo_key_temp.gpg --import ./mongoserver.asc
+gpg: creado el directorio '/home/andy/.gnupg'
+gpg: /home/andy/.gnupg/trustdb.gpg: se ha creado base de datos de confianza
+gpg: clave 160D26BB1785BA38: clave pública "MongoDB 7.0 Release Signing Key <packaging@mongodb.com>" importada
+gpg: Cantidad total procesada: 1
+gpg:               importadas: 1
+andy@cliente-mariadb-mongo-postgres:~$ gpg --no-default-keyring --keyring ./mongo_key_temp.gpg --export > ./mongoserver_key.gpg
+andy@cliente-mariadb-mongo-postgres:~$ wget -qo - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb-server-7.0.asc 
+andy@cliente-mariadb-mongo-postgres:~$ echo "deb [ arch=amd64, arm64 ] https://repo.mongodb.org/apt/debian buster/mongod b-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+deb [ arch=amd64, arm64 ]_https://repo.mongodb.org/apt/debian buster/mongodb-org/7.0 main
+deb [ arch=amd64, arm64 ] https://repo.mongodb.org/apt/debian buster/mongod b-org/7.0 main
 
-andy@cliente-mariadb:~$ sudo apt-get install -y mongodb-org
+```
+- ¿Qué hace? Importa una clave pública de MongoDB que asegura la autenticidad del software que se descargará.
+- Resultado: Se crea un archivo temporal de claves en tu computadora y se guarda la clave de MongoDB.
+
+
+2. Exportar la clave a otro archivo
+
+```
+andy@cliente-mariadb-mongo-postgres:~$ gpg --no-default-keyring --keyring ./mongo_key_temp.gpg --import ./mongoserver.asc
+gpg: creado el directorio '/home/andy/.gnupg'
+gpg: /home/andy/.gnupg/trustdb.gpg: se ha creado base de datos de confianza
+gpg: clave 160D26BB1785BA38: clave pública "MongoDB 7.0 Release Signing Key <packaging@mongodb.com>" importada
+gpg: Cantidad total procesada: 1
+gpg:               importadas: 1
+
+```
+
+
+3. Agregar el repositorio MongoDB a nuetsro sistema
+
+```
+andy@cliente-mariadb-mongo-postgres:~$ wget -qo - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb-server-7.0.asc 
+
+```
+
+4. Agregar la fuente de software de MongoDB
+
+```
+andy@cliente-mariadb-mongo-postgres:~$ echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian buster/mongodb-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/debian buster/mongodb-org/7.0 main
+
+```
+
+5. Instalar MongoDB Shell y MongoDB Shell interactivo
+Para ello nos iremos a la maquina virtual donde tenemos todos los clientes a excepción del de oracle, y procederemos a instalar lo siguiente:
+
+```
+andy@cliente-mariadb-mongo-postgres:~$ sudo apt install mongodb-org-shell mongodb-mongosh
 Leyendo lista de paquetes... Hecho
 Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
-No se pudieron instalar algunos paquetes. Esto puede significar que
-usted pidió una situación imposible o, si está usando la distribución
-inestable, que algunos paquetes necesarios aún no se han creado o se
-han sacado de «Incoming».
-La siguiente información puede ayudar a resolver la situación:
-
-Los siguientes paquetes tienen dependencias incumplidas:
- mongodb-org-mongos : Depende: libssl1.1 (>= 1.1.1) pero no es instalable
- mongodb-org-server : Depende: libssl1.1 (>= 1.1.1) pero no es instalable
-E: No se pudieron corregir los problemas, usted ha retenido paquetes rotos.
-andy@cliente-mariadb:~$ sudo apt install -y mongodb-org-shell
-Leyendo lista de paquetes... Hecho
-Creando árbol de dependencias... Hecho
-Leyendo la información de estado... Hecho
+mongodb-org-shell ya está en su versión más reciente (6.0.18).
 Se instalarán los siguientes paquetes NUEVOS:
-  mongodb-org-shell
+  mongodb-mongosh
 0 actualizados, 1 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
-Se necesita descargar 3.088 B de archivos.
-Se utilizarán 12,3 kB de espacio de disco adicional después de esta operación.
-Des:1 http://repo.mongodb.org/apt/debian buster/mongodb-org/6.0/main amd64 mongodb-org-shell amd64 6.0.18 [3.088 B]
-Descargados 3.088 B en 0s (19,0 kB/s)  
-Seleccionando el paquete mongodb-org-shell previamente no seleccionado.
-(Leyendo la base de datos ... 39755 ficheros o directorios instalados actualment
+Se necesita descargar 54,1 MB de archivos.
+Se utilizarán 268 MB de espacio de disco adicional después de esta operación.
+¿Desea continuar? [S/n] s
+Des:1 https://repo.mongodb.org/apt/debian bullseye/mongodb-org/4.4/main amd64 mongodb-mongosh amd64 2.3.2 [54,1 MB]
+Descargados 54,1 MB en 9s (6.335 kB/s)                                         
+Seleccionando el paquete mongodb-mongosh previamente no seleccionado.
+(Leyendo la base de datos ... 39766 ficheros o directorios instalados actualment
 e.)
-Preparando para desempaquetar .../mongodb-org-shell_6.0.18_amd64.deb ...
-Desempaquetando mongodb-org-shell (6.0.18) ...
-Configurando mongodb-org-shell (6.0.18) ...
-andy@cliente-mariadb:~$ 
+Preparando para desempaquetar .../mongodb-mongosh_2.3.2_amd64.deb ...
+Desempaquetando mongodb-mongosh (2.3.2) ...
+Configurando mongodb-mongosh (2.3.2) ...
+Procesando disparadores para man-db (2.11.2-2) ...
+
+```
+Ahora procederemos a meternos remotamente, ya que como vimos anets tenemos configurado el servidor de *MongoDB*, lo haremos con el siguiente comando:
+
+```mongosh --host 192.168.1.159 --port 27017 -u andy -p andy --authenticationDatabase admin```
+
+Y si lo probamos por terminal veremos lo siguiente:
+
+```
+ndy@cliente-mariadb-mongo-postgres:~$ mongosh --host 192.168.1.159 --port 27017 -u andy -p andy --authenticationDatabase admin
+Current Mongosh Log ID:	670932be4dbc6f3d16fe6910
+Connecting to:		mongodb://<credentials>@192.168.1.159:27017/?directConnection=true&authSource=admin&appName=mongosh+2.3.2
+Using MongoDB:		4.4.29
+Using Mongosh:		2.3.2
+
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+
+To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
+You can opt-out by running the disableTelemetry() command.
+
+------
+   The server generated these startup warnings when booting
+   2024-10-11T15:38:28.271+02:00: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/prodnotes-filesystem
+   2024-10-11T15:38:28.661+02:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2024-10-11T15:38:28.661+02:00: /sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'
+------
+
+test> 
 
 
 ```
+Y vemos podemos ver las siguinest base de datos:
+
+```
+
+test> show dbs
+admin          132.00 KiB
+concesionario   40.00 KiB
+config          72.00 KiB
+local           72.00 KiB
+test> 
+
+```
+
+y podremos cambiar a las distintas bases de datos:
+
+```
+
+test> use admin
+switched to db admin
+admin> 
+
+```
+
