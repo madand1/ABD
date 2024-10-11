@@ -5,3 +5,4 @@
 - [1. MariaDB](./mysql.md)
 - [2. PostgreSQL](./Postgres.md)
 - [3. MongoDB](./mongodb.md)
+- [4. Oracle](./oracle-debian.md)
