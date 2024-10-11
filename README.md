@@ -6,7 +6,7 @@
 - [2. PostgreSQL](./Postgres.md)
 - [3. MongoDB](./mongodb.md)
 - [4. Oracle](./oracle-debian.md)
-
+- [5. Redis](./redis.md)
 
 
 ## Autor :computer:
