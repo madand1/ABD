@@ -71,3 +71,58 @@ y una vez reiniciado vemos su estado con el comando:
 
 ![Acceso remoto](/Instalaciones/img/postgrestatus.png)
 
+# Creacion de un cliente en postgres
+
+Se creara un cliente que pueda entrar desde cualquier host:
+
+```
+
+andy@servidores:~$ sudo -u postgres psql 
+could not change directory to "/home/andy": Permiso denegado
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=# CREATE USER andy WITH PASSWORD 'andy';
+CREATE ROLE
+postgres=# ALTER USER andy CREATEDB;
+ALTER ROLE
+postgres=# 
+
+```
+
+Pero este cliente si lo intentamos conectar nos dara este error :
+
+```
+andy@cliente-mariadb:~$ psql -U andy -h 192.168.1.159
+Contraseña para usuario andy: 
+psql: error: falló la conexión al servidor en «192.168.1.159», puerto 5432: FATAL:  no existe la base de datos «andy»
+
+```
+ya que no hay ninguna bases de datos con ese nombre, ya que solo hemos creado el usuario, para ello nos iremos al servidor y crearemos una bases de datos, la cual llamaremos testeo, de la siguiente manera:
+
+```
+andy@servidores:~$ sudo -u postgres psql
+could not change directory to "/home/andy": Permiso denegado
+psql (15.8 (Debian 15.8-0+deb12u1))
+Type "help" for help.
+
+postgres=# \l
+postgres=# CREATE DATABASE testeo;
+CREATE DATABASE
+postgres=# 
+
+```
+Y ahroa probamos a conectarnos:
+
+```
+andy@cliente-mariadb:~$ psql -U andy -h 192.168.1.159 -d testeo
+Contraseña para usuario andy: 
+psql (15.8 (Debian 15.8-0+deb12u1))
+Conexión SSL (protocolo: TLSv1.3, cifrado: TLS_AES_256_GCM_SHA384, compresión: desactivado)
+Digite «help» para obtener ayuda.
+
+testeo=> 
+
+```
+
+y como vemos estamos conectaod y con todas la funcionalidades.

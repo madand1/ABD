@@ -129,3 +129,6 @@ net:
 ## reinciio del servicio de MongoDB
 
 ```sudo systemctl restart mongod```
+
+# Instalacion de cliente para mongodb
+
