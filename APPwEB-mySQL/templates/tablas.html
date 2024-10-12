@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablas en la Base de Datos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Tablas disponibles:</h1>
+    <ul>
+        {% for table in tables %}
+            <li>
+                <a href="{{ url_for('mostrar_tabla', nombre_tabla=table[0], db_host=db_host, db_user=db_user, db_password=db_password, db_name=db_name) }}">{{ table[0] }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

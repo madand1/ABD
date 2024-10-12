@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexión a la Base de Datos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Conéctate a la Base de Datos</h1>
+    <form method="POST" action="/">
+        <label for="db_host">IP/Host del Servidor:</label>
+        <input type="text" id="db_host" name="db_host" required>
+
+        <label for="db_user">Usuario:</label>
+        <input type="text" id="db_user" name="db_user" required>
+
+        <label for="db_password">Contraseña:</label>
+        <input type="password" id="db_password" name="db_password" required>
+
+        <label for="db_name">Nombre de la Base de Datos:</label>
+        <input type="text" id="db_name" name="db_name" required>
+
+        <input type="submit" value="Conectar">
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          <ul>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endwith %}
+</body>
+</html>
