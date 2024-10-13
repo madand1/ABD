@@ -1,3 +1,29 @@
+# Instalación de Servidor MySQL en Debian 12
+
+**Autor:** Andrés Morales González
+**Fecha:** 9-10-2024 
+**Versión:** 1.0  
+---
+
+## Índice
+
+1. [Instalación y configuración de MySQL](#instalación-y-configuración-de-mysql)  
+   1.1 [Instalar MySQL](#1-instalar-mysql)  
+   1.2 [Iniciar el servidor de MySQL](#2-iniciar-el-servidor-de-mysql)  
+   1.3 [Acceder a la consola de MySQL](#3-acceder-a-la-consola-de-mysql)  
+   1.4 [Configuración para el acceso remoto](#4-configuración-para-el-acceso-remoto)  
+      - [Paso a: Modificar archivo de configuración](#paso-a-modificar-archivo-de-configuración)  
+      - [Paso b: Reiniciar el servicio](#paso-b-reiniciar-el-servicio)  
+      - [Paso c: Crear un usuario para acceso remoto](#paso-c-crear-un-usuario-para-acceso-remoto)
+
+2. [Creación de un cliente para el acceso remoto](#creación-de-un-cliente-para-el-acceso-remoto)  
+
+3. [Conexión desde un cliente remoto](#conexión-desde-un-cliente-remoto)  
+   3.1 [Instalar cliente](#instalar-cliente)  
+   3.2 [Conectar remotamente a MySQL](#conectar-remotamente-a-mysql)
+
+---
+
 # Instalacion de servidor mysql en Debian12
 
 Para ello lo primero que haremos sera la creación de una maquina debian, sin entorno gráfico.
@@ -29,7 +55,7 @@ sudo systemctl start mariadb
 sudo systemctl enable mariadb
 ```
 
-![Acceso remoto](/Instalaciones/img/mariadb-inicio.png)
+![Acceso remoto](Instalaciones/img/mariadb-inicio.png)
 
 ## 3. Acceder a la consola de mysql
 
@@ -37,7 +63,7 @@ Cuando ya hemos instaldo podemos entrar a lo que sera la consola de MariaDB con 
 
 ```sudo mysql -u root -p```
 
-![Acceso remoto](/Instalaciones/img/aceesomysql.png)
+![Acceso remoto](Instalaciones/img/aceesomysql.png)
 
 ## 4. Configuracion para el acceso remoto
 
@@ -51,7 +77,7 @@ Tenemos que buscar la linea *bind-address* y le añadiremso la siguiente linea:
 
 ```blind-address = 0.0.0.0```
 
-![Acceso remoto](/Instalaciones/img/accesoremotomysql.png)
+![Acceso remoto](Instalaciones/img/accesoremotomysql.png)
 
 
 ### Paso b:
@@ -94,7 +120,7 @@ Bye
 
 
 ```
-El % de este comando:*REATE USER 'andy'@'%' IDENTIFIED BY 'andy';*, es para que pueda entrar desde cualquier host.
+El % de este comando:*CREATE USER 'andy'@'%' IDENTIFIED BY 'andy';*, es para que pueda entrar desde cualquier host.
 
 
 # Conexión desde un cliente remoto
