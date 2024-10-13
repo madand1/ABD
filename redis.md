@@ -1,3 +1,39 @@
+---
+title: "Instalación de Servidor Redis en Debian 12"
+geometry: margin=1in
+output: pdf_document
+---
+
+# Instalación de Servidor Redis en Debian 12
+
+![Logo de MySQL](Instalaciones/img/redisdebian.jpg)
+
+## Autor :computer:
+* Andrés Morales González
+* :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
+
+
+<div style="page-break-after: always;"></div>
+
+
+# Índice
+
+- [Instalación de Servidor Redis en Debian 12](#instalación-de-servidor-redis-en-debian-12)
+  - [Autor :computer:](#autor-computer)
+- [Índice](#índice)
+- [Base de datos NoSQL](#base-de-datos-nosql)
+    - [¿Qué es Redis?](#qué-es-redis)
+    - [Diferencias entre Redis y Bases de Datos Relacionales](#diferencias-entre-redis-y-bases-de-datos-relacionales)
+    - [Diferencias Clave](#diferencias-clave)
+  - [Instalación](#instalación)
+  - [Conexión en remoto](#conexión-en-remoto)
+  - [Instalación del cliente](#instalación-del-cliente)
+
+
+
+<div style="page-break-after: always;"></div>
+
+
 # Base de datos NoSQL
 
 ### ¿Qué es Redis?

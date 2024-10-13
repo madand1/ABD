@@ -1,3 +1,38 @@
+---
+title: "Instalación de Servidor PostgreSQL en Debian 12"
+geometry: margin=1in
+output: pdf_document
+---
+
+# Instalación de Servidor PostgreSQL en Debian 12
+
+![Logo de MySQL](Instalaciones/img/postgres-debian.jpg)
+
+## Autor :computer:
+* Andrés Morales González
+* :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
+
+
+<div style="page-break-after: always;"></div>
+
+
+# Índice
+
+- [Instalación de Servidor PostgreSQL en Debian 12](#instalación-de-servidor-postgresql-en-debian-12)
+  - [Autor :computer:](#autor-computer)
+- [Índice](#índice)
+- [Instalacion de servidor Postgres en Debian12](#instalacion-de-servidor-postgres-en-debian12)
+- [Instalación y configuracion de PostgreSQL](#instalación-y-configuracion-de-postgresql)
+  - [1. Instalar PostgreSQL](#1-instalar-postgresql)
+  - [2. Configuracion para el acceso remoto](#2-configuracion-para-el-acceso-remoto)
+    - [Paso a:](#paso-a)
+    - [Paso b:](#paso-b)
+    - [Paso c:](#paso-c)
+- [Creacion de un cliente en postgres](#creacion-de-un-cliente-en-postgres)
+
+
+<div style="page-break-after: always;"></div>
+
 # Instalacion de servidor Postgres en Debian12
 
 Para ello lo primero que haremos sera la creación de una maquina debian, sin entorno gráfico.

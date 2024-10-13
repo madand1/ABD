@@ -1,3 +1,44 @@
+---
+title: "Instalación de Servidor Oracle en Debian 12"
+geometry: margin=1in
+output: pdf_document
+---
+
+# Instalación de Servidor Oracle en Debian 12
+
+![Logo de MySQL](Instalaciones/img/debian-and-oracle.jpg)
+
+## Autor :computer:
+* Andrés Morales González
+* :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
+
+
+<div style="page-break-after: always;"></div>
+
+## Índice
+
+# Índice
+
+- [Instalación de Servidor Oracle en Debian 12](#instalación-de-servidor-oracle-en-debian-12)
+  - [Autor :computer:](#autor-computer)
+  - [Índice](#índice)
+- [Índice](#índice-1)
+- [Preparación previa](#preparación-previa)
+- [Instalación de Oracle](#instalación-de-oracle)
+  - [Creación de tablas:](#creación-de-tablas)
+  - [Configuración para acceso en remoto](#configuración-para-acceso-en-remoto)
+    - [Modificación de archivos](#modificación-de-archivos)
+  - [Conexion a sqldeveloper](#conexion-a-sqldeveloper)
+  - [Conexion a cliente por SQLPLUS](#conexion-a-cliente-por-sqlplus)
+    - [Descarga de los paquetes:](#descarga-de-los-paquetes)
+    - [Descompresión de paquetes](#descompresión-de-paquetes)
+    - [Instalacion de dependencias](#instalacion-de-dependencias)
+    - [Declaración de variables de entorno](#declaración-de-variables-de-entorno)
+    - [Prueba de conexión](#prueba-de-conexión)
+
+
+<div style="page-break-after: always;"></div>
+
 # Preparación previa
 
 Para la instalacion y configuración de lo que es sistema de gestión de bases de datos, en concreto Oracle 21c, lo haremos a través de un máquina virtual, y lo primero que haremos sera hacer una actualización del sistema  (repositorios):

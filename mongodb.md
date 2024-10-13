@@ -1,8 +1,43 @@
-# Instalacion MONGODB
+---
+title: "Instalación MongoDB en Debian 12"
+geometry: margin=1in
+output: pdf_document
+---
+
+# Instalación de Servidor MongoDB en Debian 12
+
+![Logo de MySQL](Instalaciones/img/mongo+debian.jpeg)
+
+## Autor :computer:
+* Andrés Morales González
+* :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
+
+
+<div style="page-break-after: always;"></div>
+
+# Índice
+
+- [Instalación de Servidor MongoDB en Debian 12](#instalación-de-servidor-mongodb-en-debian-12)
+  - [Autor :computer:](#autor-computer)
+- [Índice](#índice)
+- [Instalacion MONGODB eb Debian12](#instalacion-mongodb-eb-debian12)
+  - [Actualizar el sistema](#actualizar-el-sistema)
+  - [Importar la clave GPC de MongoDB](#importar-la-clave-gpc-de-mongodb)
+  - [Agregar el repositorio de MongoDB](#agregar-el-repositorio-de-mongodb)
+  - [Instalar MongoDB](#instalar-mongodb)
+  - [Configuración acceso remoto](#configuración-acceso-remoto)
+  - [Reinicio del servicio de MongoDB](#reinicio-del-servicio-de-mongodb)
+- [Creacion de un usuario](#creacion-de-un-usuario)
+- [Instalacion de cliente para mongodb](#instalacion-de-cliente-para-mongodb)
+
+
+<div style="page-break-after: always;"></div>
+
+# Instalacion MONGODB eb Debian12
 
 ## Actualizar el sistema
 
-## imprtar la clave GPC de MongoDB
+## Importar la clave GPC de MongoDB
 
 Antes de agregar lo que sera el repositorio de MongoD, lo que vamos a necesitar es la clave pública:
 
