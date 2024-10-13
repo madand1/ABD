@@ -1,9 +1,19 @@
+---
+title: "Instalación de Servidor MySQL en Debian 12"
+geometry: margin=1in
+output: pdf_document
+---
+
 # Instalación de Servidor MySQL en Debian 12
 
-**Autor:** Andrés Morales González
-**Fecha:** 9-10-2024 
-**Versión:** 1.0  
----
+![Logo de MySQL](Instalaciones/img/logo-mysql-debian.jpeg)
+
+## Autor :computer:
+* Andrés Morales González
+* :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
+
+
+<div style="page-break-after: always;"></div>
 
 ## Índice
 
@@ -22,7 +32,7 @@
    3.1 [Instalar cliente](#instalar-cliente)  
    3.2 [Conectar remotamente a MySQL](#conectar-remotamente-a-mysql)
 
----
+<div style="page-break-after: always;"></div>
 
 # Instalacion de servidor mysql en Debian12
 
