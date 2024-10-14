@@ -29,6 +29,8 @@ output: pdf_document
   - [Configuración para acceso en remoto](#configuración-para-acceso-en-remoto)
     - [Modificación de archivos](#modificación-de-archivos)
   - [Conexion a sqldeveloper](#conexion-a-sqldeveloper)
+    - [No trabajar desde el SID](#no-trabajar-desde-el-sid)
+    - [Trabajar desde Servicios](#trabajar-desde-servicios)
   - [Conexion a cliente por SQLPLUS](#conexion-a-cliente-por-sqlplus)
     - [Descarga de los paquetes:](#descarga-de-los-paquetes)
     - [Descompresión de paquetes](#descompresión-de-paquetes)
@@ -41,10 +43,10 @@ output: pdf_document
 
 # Preparación previa
 
-Para la instalacion y configuración de lo que es sistema de gestión de bases de datos, en concreto Oracle 21c, lo haremos a través de un máquina virtual, y lo primero que haremos sera hacer una actualización del sistema  (repositorios):
+Para la instalación y configuración de lo que es sistema de gestión de bases de datos, en concreto Oracle 21c, lo haremos a través de un máquina virtual, y lo primero que haremos sera hacer una actualización del sistema  (repositorios):
 
 ```
-andy@oracle-servidor:~$ sudo apt update && sudo apt upgrade -y
+andy@oracle-server:~$ sudo apt update && sudo apt upgrade -y
 [sudo] contraseña para andy: 
 Obj:1 http://security.debian.org/debian-security bookworm-security InRelease
 Obj:2 http://deb.debian.org/debian bookworm InRelease
@@ -58,14 +60,14 @@ Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
 Calculando la actualización... Hecho
 0 actualizados, 0 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
-andy@oracle-servidor:~$ 
+andy@oracle-server:~$ 
 
 ```
 
 El siguiente paso sera la instalación de las dependencias necesarias de Oracle:
 
 ```
-andy@oracle-servidor:~$ sudo apt install libaio1 unixodbc bc ksh gawk -y
+andy@oracle-server:~$ sudo apt install libaio1 unixodbc bc ksh gawk -y
 Leyendo lista de paquetes... Hecho
 Creando árbol de dependencias... Hecho
 Leyendo la información de estado... Hecho
@@ -76,6 +78,11 @@ Paquetes sugeridos:
 Se instalarán los siguientes paquetes NUEVOS:
   bc gawk ksh ksh93u+m libaio1 libltdl7 libmpfr6 libodbc2 libodbcinst2
   libsigsegv2 unixodbc unixodbc-common
+0 actualizados, 12 nuevos se instalarán, 0 para eliminar y 0 no actualizados.
+Se necesita descargar 3.079 kB de archivos.
+Se utilizarán 8.992 kB de espacio de disco adicional después de esta operación.
+Des:1 http://deb.debian.org/debian bookworm/main amd64 libmpfr6 amd64 4.2.0-1 [701 kB]
+
 ......
 ......
 ......
@@ -95,9 +102,11 @@ Procesando disparadores para libc-bin (2.36-9+deb12u8) ...
 Vamos a crear un grupo llamado dba y el usuario oracle:
 
 ```
-andy@oracle-servidor:~$ sudo adduser --ingroup dba --home /home/oracle --shell /bin/bash oracle
+andy@oracle-server:~$ sudo groupadd dba
+```
+```
+andy@oracle-server:~$ sudo adduser --ingroup dba --home /home/oracle --shell /bin/bash oracle
 Añadiendo el usuario `oracle' ...
-
 Adding new user `oracle' (1001) with group `dba (1001)' ...
 Creando el directorio personal `/home/oracle' ...
 Copiando los ficheros desde `/etc/skel' ...
@@ -114,6 +123,16 @@ Introduzca el nuevo valor, o pulse INTRO para usar el valor predeterminado
 ¿Es correcta la información? [S/n] s
 Adding new user `oracle' to supplemental / extra groups `users' ...
 Añadiendo al usuario `oracle' al grupo `users' ...
+```
+Creaciond e directorio para oracle server
+
+```
+andy@oracle-server:~$ mkdir servidor
+andy@oracle-server:~$ ls
+servidor
+andy@oracle-server:~$ cd servidor/
+andy@oracle-server:~/servidor$ 
+
 
 ```
 
@@ -255,7 +274,7 @@ La he puesto de forma estatica, en el fichero de configuracion de red */etc/netw
 Ahora procederemos a instalarlo usando el comando dpkg -i, ya que lo tenemos transformado .deb:
 
 ```
-andy@oracle-servidor:~$ sudo dpkg -i oracle-database-ee-21c_1.0-2_amd64.deb 
+andy@oracle-server:~$ sudo dpkg -i oracle-database-ee-21c_1.0-2_amd64.deb 
 [sudo] contraseña para andy: 
 Seleccionando el paquete oracle-database-ee-21c previamente no seleccionado.
 (Leyendo la base de datos ... 42951 ficheros o directorios instalados actualmente.)
@@ -274,11 +293,13 @@ Como podemos ver en esta linea:
 
 *_To configure a sample Oracle Database you can execute the following service configuration script as root: /etc/init.d/oracledb_ORCLCDB-21c configure_*
 
+>[!WARNING]
+>Para que esto salga tienes que tener en el fichero /etc/hosts unia linea tal que asi: 192.168.x.x oracle-server
+
 Tendremos que ejecutar siendo *ROOT*, el siguiente comando,*_/etc/init.d/oracledb_ORCLCDB-21c configure _* que sera para comenzar la instalación:
 
 ```
-andy@oracle-servidor:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c configure
-[sudo] contraseña para andy: 
+andy@oracle-server:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c configure
 Configuring Oracle Database ORCLCDB.
 Preparar para funcionamiento de base de datos
 8% completado
@@ -303,12 +324,12 @@ Creación de la base de datos terminada. Consulte los archivos log de /opt/oracl
 Información de Base de Datos:
 Nombre de la Base de Datos Global:ORCLCDB
 Identificador del Sistema (SID):ORCLCDB
-Para obtener información detallada, consulte el archivo log "/opt/oracle/cfgtoollogs/dbca/ORCLCDB/ORCLCDB1.log".
+Para obtener información detallada, consulte el archivo log "/opt/oracle/cfgtoollogs/dbca/ORCLCDB/ORCLCDB2.log".
 
 Database configuration completed successfully. The passwords were auto generated, you must change them by connecting to the database using 'sqlplus / as sysdba' as the oracle user.
 
 ```
-Ya tenemos la instalación, ahora que ocurre, que no podemso usarlo como tal, ya que para poder usar lo que es el usuario de ORACLE, habra que exportar las variables de entorno al siguiente directorio */home/oracle/.bashrc* para entrar a este fichero en dicho directorio, tendremso que entarr siendo *ROOT*, al cual le tendremos que poner las siguientes variables de entorno:
+Ya tenemos la instalación, ahora que ocurre, que no podemos usarlo como tal, ya que para poder usar lo que es el usuario de ORACLE, habra que exportar las variables de entorno al siguiente directorio */home/oracle/.bashrc* para entrar a este fichero en dicho directorio, tendremso que entarr siendo *ROOT*, al cual le tendremos que poner las siguientes variables de entorno:
 
 ```
 export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
@@ -407,7 +428,7 @@ SQL>
 
 
 ```
-Vamos a crear un usuario, y darle permisos, y comprobar que tiene acceso, voy a trabar con el usuario oracle.
+Vamos a crear un usuario, y darle permisos, y comprobar que tiene acceso, voy a trabajar con el usuario oracle.
 
 Si nos damos cuenta cuando hemos entrado  con el usuario oracle estamso en la instancia, y por mucho que hagamos algo nos dara un error:
 
@@ -595,8 +616,11 @@ andy@oracle-servidor:/opt/oracle/product/21c/dbhome_1/network/admin/samples$ nan
 andy@oracle-servidor:/opt/oracle/product/21c/dbhome_1/network/admin/samples$ sudo nano listener.ora 
 
 ```
+>[!NOTE]
+>Esto que vamos a poner a continuación se tendra que poner en cada uno de los usuarios que esten dentro de la base de datos
 
 Dentro de este archivo lo que podemos ver reflejado son los punoos de conexión y los propios protocolos que el servidor ORACLE suara para gestionar las conexines de los clientes, cuando nosotros los vemos estaria tal que así:
+
 
 ```
 # LISTENER =
@@ -618,12 +642,12 @@ LISTENER =
 Una vez hecho el cambio lo podemos reiniciar:
 
 ```
-andy@oracle-servidor:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c restart
+andy@oracle-server:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c restart
 ```
 El cual nos hara lo siguiente:
 
 ```
-andy@oracle-servidor:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c restart
+andy@oracle-server:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c restart
 Starting Oracle Net Listener.
 Oracle Net Listener started.
 Starting Oracle Database instance ORCLCDB.
@@ -633,7 +657,7 @@ Oracle Database instance ORCLCDB started.
 Y veremos el estado en el que se encuentra:
 
 ```
-andy@oracle-servidor:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c status
+andy@oracle-server:~$ sudo /etc/init.d/oracledb_ORCLCDB-21c status
 Status of the Oracle ORCLCDB 21c service:
 
 LISTENER status: RUNNING
@@ -641,9 +665,10 @@ ORCLCDB Database status:   RUNNING
 
 
 ```
+
 ## Conexion a sqldeveloper
 
-Para ello lo que haremso sera bajarnoslo desde esta URL: https://www.oracle.com/database/sqldeveloper/technologies/download/ y lo tendremos que extarer donde mejor nos venga.
+Para ello lo que haremos sera bajarnoslo desde esta URL: https://www.oracle.com/database/sqldeveloper/technologies/download/ y lo tendremos que extarer donde mejor nos venga.
 
 Una vez hecho esto, tendremos que activarlo por temrinal, y le tendremos que poner por comando *./sqldeveloper.sh*, y ya solo tendremos que hacerlo graficamente, como muestro a continuación:
 
@@ -662,6 +687,88 @@ Y ya cuando lo conectamos lo podemos ver como se pone en la parte izquierda, en 
 
 
 ![conexion hecha](img/image-1.png)
+
+### No trabajar desde el SID
+
+Esto que acabamos de donde hemos entrado es el *SID* y ¿que es el sid?
+
+-*El SID (System Identifier)* en Oracle es un identificador único que asigna un nombre a una instancia de base de datos. Una instancia de base de datos es un conjunto de procesos de servidor y estructuras de memoria que permiten interactuar con los datos almacenados en los archivos físicos de la base de datos. El SID es fundamental para identificar y conectar una instancia de Oracle.
+
+>[!CAUTION]
+> Esto no se toca, por eso lo vamos a poner del siguiente color y con el siguiente nombre:
+![conexion hecha](Instalaciones/img/no-tocar.png)
+
+### Trabajar desde Servicios
+
+Si no que lo que haremos será crear un servicio dentro del SID en Oracle para un Usuario y SYSDBA, con los siguientes pasos:
+
+1. Conéctate como SYSDBA
+Primero, necesitaremos conectarnos a la base de datos con privilegios de SYSDBA. Esto nos permitira gestionar la base de datos y crear servicios.
+
+```sqlplus / as sysdba```
+
+2. Crear el Servicio
+Utiliza el paquete DBMS_SERVICE para crear un servicio dentro de tu SID. En este ejemplo, crearemos un servicio llamado servicio_prueba.
+
+```
+BEGIN
+    DBMS_SERVICE.CREATE_SERVICE(
+        service_name => 'servicio_prueba', 
+        network_name => 'servicio_prueba'
+    );
+END;
+/
+
+```
+
+Explicación:
+service_name: Este es el nombre del servicio que estás creando (en este caso, servicio_prueba).
+network_name: Es el nombre con el que los clientes de red podrán conectarse.
+
+3. Iniciar el Servicio
+Después de crear el servicio, debemso iniciarlo para que esté activo y los usuarios puedan conectarse.
+
+```EXEC DBMS_SERVICE.START_SERVICE('servicio_prueba');```
+
+Explicación:
+Este comando hace que el servicio que acabas de crear esté disponible para conexiones de red.
+
+4. Crear un Usuario y Asignar Privilegios
+Ahora, crea el usuario que va a utilizar este servicio. Si el usuario ya existe, puedes saltar este paso. En este caso, creamos un usuario llamado user_test con la contraseña password.
+
+```CREATE USER paco IDENTIFIED BY paco;```
+Dale los privilegios necesarios para conectarse y utilizar los recursos de la base de datos:
+
+```GRANT CONNECT, RESOURCE TO paco;```
+
+Explicación:
+
+- CREATE USER: Crea un nuevo usuario en la base de datos.
+
+- GRANT CONNECT, RESOURCE: Estos son privilegios básicos para permitir al usuario conectarse y crear objetos dentro de la base de datos.
+
+6. Verificar el Servicio
+Para confirmar que el servicio se ha creado correctamente y está activo, puedes consultar los servicios registrados en la base de datos:
+
+```SELECT name FROM dba_services;```
+
+Explicación:
+Esta consulta te mostrará todos los servicios activos en la base de datos, incluyendo el que acabas de crear.
+
+7. Conectarse al Servicio
+Tanto el nuevo usuario como SYSDBA pueden conectarse utilizando el servicio recién creado. Para conectarte desde un cliente como SQL*Plus o SQL Developer, usa la siguiente sintaxis:
+
+```
+sqlplus upaco/paco@192.168.1.155:port/servicio_prueba1
+
+Conectarse como SYSDBA:
+
+sqlplus sys/usuario@192.168.1.155:port/servicio_prueba as sysdba
+
+```
+Verificación de conexión al servicio:
+
+![conexion a un servicio](img/paco.png)
 
 ## Conexion a cliente por SQLPLUS
 
@@ -804,6 +911,8 @@ Procesando disparadores para libc-bin (2.36-9+deb12u8) ...
 
 ### Declaración de variables de entorno
 
+
+
 ```
 ndy@clientes:~$ cat ~/.bashrc
 # ~/.bashrc: executed by bash(1) for non-login shells.
@@ -875,3 +984,5 @@ Y como podemos ver lo tenemos plenamente conectado con nuestro usuario.
    1. 192.168.1.151 es la dirección IP del servidor.
    2. 1521 es el puerto del listener.
    3. ORCLCDB es el nombre del servicio de la base de datos.
+
+A la hora de conexion lo que tendremos que hacer es crear *SERVICIOS* desde sys tendremos que crear servicios, para tablas, meter usuariop y dar poder para que puedan hacer cosas.
