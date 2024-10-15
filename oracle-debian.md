@@ -17,12 +17,10 @@ output: pdf_document
 
 ## Índice
 
-# Índice
 
 - [Instalación de Servidor Oracle en Debian 12](#instalación-de-servidor-oracle-en-debian-12)
   - [Autor :computer:](#autor-computer)
   - [Índice](#índice)
-- [Índice](#índice-1)
 - [Preparación previa](#preparación-previa)
 - [Instalación de Oracle](#instalación-de-oracle)
   - [Creación de tablas:](#creación-de-tablas)
@@ -37,6 +35,7 @@ output: pdf_document
     - [Instalacion de dependencias](#instalacion-de-dependencias)
     - [Declaración de variables de entorno](#declaración-de-variables-de-entorno)
     - [Prueba de conexión](#prueba-de-conexión)
+
 
 
 <div style="page-break-after: always;"></div>
