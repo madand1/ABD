@@ -11,7 +11,7 @@
 
 ## Aplicación
 
-- [mysql](.APPwEB-mySQL/app.py)
+- [mysql](APPwEB-mySQL/app.py)
 ## Autor :computer:
 * Andrés Morales González
 * :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
