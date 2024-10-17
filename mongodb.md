@@ -141,7 +141,7 @@ sudo systemctl enable mongod
 
 Comprobación:
 
-![Enable mongo](/Instalaciones/img/enablemongo.png)
+![Enable mongo](Instalaciones/img/enablemongo.png)
 
 ## Configuración acceso remoto
 Para habilitar lo que sera el acceso remoto tendremos unos pasos que seguir:
@@ -167,7 +167,7 @@ net:
    port: 27017
 '''
 
-![Acceso remoto](/Instalaciones//img/remotomongo.png)
+![Acceso remoto](Instalaciones//img/remotomongo.png)
 
 ## Reinicio del servicio de MongoDB
 
