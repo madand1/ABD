@@ -20,7 +20,7 @@ output: pdf_document
 - [Instalación de Servidor MongoDB en Debian 12](#instalación-de-servidor-mongodb-en-debian-12)
   - [Autor :computer:](#autor-computer)
 - [Índice](#índice)
-- [Instalacion MONGODB eb Debian12](#instalacion-mongodb-eb-debian12)
+- [Instalación MONGODB eb Debian12](#instalación-mongodb-eb-debian12)
   - [Actualizar el sistema](#actualizar-el-sistema)
   - [Importar la clave GPC de MongoDB](#importar-la-clave-gpc-de-mongodb)
   - [Agregar el repositorio de MongoDB](#agregar-el-repositorio-de-mongodb)
@@ -28,12 +28,12 @@ output: pdf_document
   - [Configuración acceso remoto](#configuración-acceso-remoto)
   - [Reinicio del servicio de MongoDB](#reinicio-del-servicio-de-mongodb)
 - [Creacion de un usuario](#creacion-de-un-usuario)
-- [Instalacion de cliente para mongodb](#instalacion-de-cliente-para-mongodb)
+- [Instalación de cliente para mongodb](#instalación-de-cliente-para-mongodb)
 
 
 <div style="page-break-after: always;"></div>
 
-# Instalacion MONGODB eb Debian12
+# Instalación MONGODB eb Debian12
 
 ## Actualizar el sistema
 
@@ -139,7 +139,7 @@ sudo systemctl enable mongod
 
 ```
 
-Comprobacion:
+Comprobación:
 
 ![Enable mongo](/Instalaciones/img/enablemongo.png)
 
@@ -203,7 +203,7 @@ The server generated these startup warnings when booting:
 >
 ```
 
-Ahora vamos a crear un usuario en la base de datos de admin, el cual se llamara andy, y contraseña andy, por pamtalla se vera asi:
+Ahora vamos a crear un usuario en la base de datos de admin, el cual se llamara andy, y contraseña andy, por pamtalla se vera así:
 
 ```
 > use admin
@@ -259,7 +259,7 @@ switched to db concesionario
 
 ```
 
-# Instalacion de cliente para mongodb
+# Instalación de cliente para mongodb
 
 Para ello nos iremos a la maquina virtual donde tenemos todos los clientes a excepción del de oracle, y procederemos a instalar lo siguiente:
 

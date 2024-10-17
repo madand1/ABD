@@ -142,18 +142,7 @@ madandy@toyota-hilux:~/Descargas$ ls
 oracle-database-ee-21c-1.0-1.ol8.x86_64.rpm
 ```
 
-Ahora lo que haremos sera pasarlo por scp a nuestra máquina virtual:
-
-```
-madandy@toyota-hilux:~/Descargas$ scp ~/Descargas/oracle-database-ee-21c-1.0-1.ol8.x86_64.rpm andy@192.168.1.151:/home/andy/abd
-andy@192.168.1.151's password: 
-oracle-database-ee-21c-1.0-1.ol8.x86_64.rpm   100% 2627MB 358.3MB/s   00:07   
-```
-
-Podemos ver como lo tenemos ya pasado:
-
-
-Como el paquete .rpm que vamnso a instalar pertenece a los paquetes propios de Red Hat, por lo que NO se puede instalar en distribuciones Debian, ya que para eso estan preparadas las máquinas Oracle Linux, tendremos que instalar Alien, el cual es un programa que es capaz de convertir paquetes de Linux a distintos formatos.
+Como el paquete .rpm que vamnos a instalar pertenece a los paquetes propios de Red Hat, por lo que *NO* se puede instalar en distribuciones Debian, ya que para eso estan preparadas las máquinas Oracle Linux, tendremos que instalar Alien, el cual es un programa que es capaz de convertir paquetes de Linux a distintos formatos.
 
 ```
 madandy@toyota-hilux: sudo apt-get  install alien
@@ -192,7 +181,8 @@ Procesando disparadores para dbus (1.14.10-1~deb12u1) ...
 
 ```
 
-Ahora vamos a convertir el paquete desde mi host que meter lo siguiente:
+Ahora convertiremos el paquete desde mi host que meter lo siguiente:
+
 ```
 madandy@toyota-hilux:~/Documentos/SegundoASIR/Administración bases de datos/ABD$
  sudo alien --to-deb oracle-database-ee-21c-1.0-1.ol8.x86_64.rpm --scripts
@@ -218,7 +208,7 @@ warning: oracle-database-ee-21c-1.0-1.ol8.x86_64.rpm: Header V3 RSA/SHA256 Signa
 Lo que vemos como warning son solo advertencias sobre lo que seria la firma del paquete RPM.
 
 
-Y nos saldra el siguiente mensaje, al final de este proceso:
+Y nos saldrá el siguiente mensaje, al final de este proceso:
 
 ```
 madandy@toyota-hilux:~/Documentos/SegundoASIR/Administración bases de datos/ABD$
@@ -254,7 +244,7 @@ andy@192.168.1.151's password:
 oracle-database-ee-21c_1.0-2_amd64.deb                                                          100% 2456MB 308.2MB/s   00:07  
 ```
 
-Y ya la tendremos en nuetsra maquina del servidor oracle:
+Y ya la tendremos en nuestra máquina del servidor oracle:
 
 ```
 andy@oracle-servidor:~$ ls
@@ -264,13 +254,13 @@ oracle-database-ee-21c_1.0-2_amd64.deb
 
 # Instalación de Oracle
 
-Para proceder a la instalacion del servidor, lo primero que tendremos que hacer sera poner en nuestro fichero */etc/hosts* con nuetsra direccion privada:
+Para proceder a la instalación del servidor, lo primero que tendremos que hacer sera poner en nuestro fichero */etc/hosts* con nuestra dirección privada:
 ```
 ip -c a: 192.168.1.151
 ```
-La he puesto de forma estatica, en el fichero de configuracion de red */etc/network/interfaces*
+La he puesto de forma estática, en el fichero de configuración de red */etc/network/interfaces*
 
-Ahora procederemos a instalarlo usando el comando dpkg -i, ya que lo tenemos transformado .deb:
+Ahora procederemos a instalarlo usando el comando *dpkg -i*, ya que lo tenemos transformado *.deb*:
 
 ```
 andy@oracle-server:~$ sudo dpkg -i oracle-database-ee-21c_1.0-2_amd64.deb 
@@ -288,7 +278,7 @@ Procesando disparadores para libc-bin (2.36-9+deb12u8) ...
 
 ```
 
-Como podemos ver en esta linea:
+Como podemos ver en esta línea:
 
 *_To configure a sample Oracle Database you can execute the following service configuration script as root: /etc/init.d/oracledb_ORCLCDB-21c configure_*
 
@@ -339,6 +329,7 @@ export LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
 
 ```
 y a continuación vemos como lo tenemos ya puesto:
+
 ```
 andy@oracle-servidor:~$ sudo su
 root@oracle-servidor:/home/andy# cd /home/oracle/
@@ -384,7 +375,7 @@ root@oracle-servidor:/home/oracle#
 
 ```
 
-Y para acceder a la base de datos, como hicimos anteriormente creamos un grupo dba donde pusimos el usuario *oracle*, con lo que tendremos que cambiar de usuario que este tiene los permisos para entrar:
+Y para acceder a la base de datos, como hicimos anteriormente crearemos un grupo dba donde pusimos el usuario *oracle*, con lo que tendremos que cambiar de usuario que este tiene los permisos para entrar:
 
 ```
 andy@oracle-servidor:~$ sudo su - oracle
@@ -429,7 +420,7 @@ SQL>
 ```
 Vamos a crear un usuario, y darle permisos, y comprobar que tiene acceso, voy a trabajar con el usuario oracle.
 
-Si nos damos cuenta cuando hemos entrado  con el usuario oracle estamso en la instancia, y por mucho que hagamos algo nos dara un error:
+Si nos damos cuenta cuando hemos entrado con el usuario *oracle* estamso en la instancia, y por mucho que hagamos algo nos dara un error:
 
 ```
 oracle@oracle-servidor:~$ sqlplus / as sysdba
@@ -443,7 +434,7 @@ Connected to an idle instance.
 
 SQL> 
 ```
-El error que nos dara sera este:
+El error que nos dara será este:
 
 ```
 SQL> CREATE USER andresmorales IDENTIFIED BY andresmorales;
@@ -455,7 +446,7 @@ Process ID: 0
 Session ID: 0 Serial number: 0
 
 ```
-Esto se debe a que tenemos la instancia apagada , para quitar este error, metermos este comando ```STARTUP;```
+Esto se debe a que tenemos la instancia apagada, para quitar este error, metermos este comando ```STARTUP;```
 
 Lo primero de todo para eviatr errores en la creacion de usuario, tendremso que meter por la consola de aqlplu. el siguiente comando:
 

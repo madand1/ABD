@@ -67,7 +67,7 @@ Tenemos que buscar la linea *listen_addresses* y le añadiremso la siguiente lin
 
 ```listen_addresses = '*'```
 
-![Acceso remoto](/Instalaciones/img/postgresaccesoremoto.png)
+![Acceso remoto](Instalaciones/img/postgresaccesoremoto.png)
 
 ### Paso b:
 
@@ -92,7 +92,7 @@ host    all             all             0.0.0.0/0               scram-sha-256
 
 Con lo que quedaria asi:
 
-![Acceso remoto](/Instalaciones/img/red-permiso.png)
+![Acceso remoto](Instalaciones/img/red-permiso.png)
 
 ### Paso c:
 
@@ -104,11 +104,11 @@ y una vez reiniciado vemos su estado con el comando:
 
 ```sudo systemctl status postgresql```
 
-![Acceso remoto](/Instalaciones/img/postgrestatus.png)
+![Acceso remoto](Instalaciones/img/postgrestatus.png)
 
 # Creacion de un cliente en postgres
 
-Se creara un cliente que pueda entrar desde cualquier host:
+Se creará un cliente que pueda entrar desde cualquier host:
 
 ```
 
@@ -147,7 +147,7 @@ CREATE DATABASE
 postgres=# 
 
 ```
-Y ahroa probamos a conectarnos:
+Y ahora probamos a conectarnos:
 
 ```
 andy@cliente-mariadb:~$ psql -U andy -h 192.168.1.159 -d testeo
@@ -160,4 +160,4 @@ testeo=>
 
 ```
 
-y como vemos estamos conectaod y con todas la funcionalidades.
+y como vemos estamos conectado y con todas la funcionalidades.

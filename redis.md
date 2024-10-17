@@ -49,6 +49,8 @@ Redis se usa mucho para **caché**, **sesiones de usuario**, o sistemas que requ
 
 ### Diferencias entre Redis y Bases de Datos Relacionales
 
+En esta apartado lo que haré sera hacer una tabla comparativa entre una bases de daros relacion y no relacional.
+
 | Característica             | **Redis (NoSQL)**                    | **Bases de Datos Relacionales (SQL)** |
 |----------------------------|--------------------------------------|---------------------------------------|
 | **Modelo de datos**         | Clave-valor                         | Tablas con filas y columnas           |

@@ -36,7 +36,7 @@ output: pdf_document
 
 # Instalacion de servidor mysql en Debian12
 
-Para ello lo primero que haremos sera la creación de una maquina debian, sin entorno gráfico.
+Para ello lo primero que haremos sera la creación de una máquina debian, sin entorno gráfico.
 
 Una vez realizada procedermos a la instalación por comandos de dicho servidor:
 
@@ -58,7 +58,7 @@ Este comando sera para la instalación de nuestro servidor:
 
 ## 2. Iniciamos el servido de mysql
 
-Despues de la instalación, iniciarmeos MariaDB y euq este sea habilitado para que se inicie de manera *automatica*:
+Despues de la instalación, iniciarmeos MariaDB y que este sea habilitado para que se inicie de manera *automatica*:
 
 ``` 
 sudo systemctl start mariadb
@@ -69,7 +69,7 @@ sudo systemctl enable mariadb
 
 ## 3. Acceder a la consola de mysql
 
-Cuando ya hemos instaldo podemos entrar a lo que sera la consola de MariaDB con el siguiente comando:
+Cuando ya hemos instalado podemos entrar a lo que será la consola de MariaDB con el siguiente comando:
 
 ```sudo mysql -u root -p```
 
@@ -79,7 +79,7 @@ Cuando ya hemos instaldo podemos entrar a lo que sera la consola de MariaDB con 
 
 ### Paso a:
 
-Modificamso el archivo de configuración postgresql.conf para permitir conexiones desde la red local:
+Modificamos el archivo de configuración _postgresql.conf_ para permitir conexiones desde la red local:
 
 ```sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf```
 
@@ -130,7 +130,7 @@ Bye
 
 
 ```
-El % de este comando:*CREATE USER 'andy'@'%' IDENTIFIED BY 'andy';*, es para que pueda entrar desde cualquier host.
+El *%* de este comando:*CREATE USER 'andy'@'%' IDENTIFIED BY 'andy';*, es para que pueda entrar desde cualquier host.
 
 
 # Conexión desde un cliente remoto
@@ -141,7 +141,7 @@ Comando para la instalación:
 
 ```sudo apt install mariadb-client```
 
-y se veria de esta manera su instalación:
+y se vería de esta manera su instalación:
 
 ```
 andy@cliente-mariadb:~$ sudo apt install mariadb-client
