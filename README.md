@@ -1,4 +1,4 @@
-# Adminsitración de bases de datos
++# Adminsitración de bases de datos
 
 ## Instalaciones
 
@@ -9,6 +9,9 @@
 - [5. Redis](./redis.md)
 - [6. BatmanSQL](./batmanSQL.md)
 
+## Aplicación
+
+- [mysql](/.APPwEB-mySQL/app.py)
 ## Autor :computer:
 * Andrés Morales González
 * :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
