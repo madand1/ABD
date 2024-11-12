@@ -16,6 +16,8 @@
 ## DB-LINK
 
 - [1. DBLink:PostgreSQL-PostgreSQL](./dblink-Postgres.md)
+- [2. DBLink:Oracle-Oracle](./dblink-Oraclex2.md)
+
 
 ## Autor :computer:
 * Andrés Morales González
