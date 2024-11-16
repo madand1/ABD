@@ -17,7 +17,8 @@
 
 - [1. DBLink:PostgreSQL-PostgreSQL](./dblink-Postgres.md)
 - [2. DBLink:Oracle-Oracle](./dblink-Oraclex2.md)
-
+- [3. DBLink:Oracle-PostgreSQL](./dblink-OraclexPostgre.md)
+- [4. DBLink:Oracle-MariaDB](./dblink-OraclexMariadb.md)
 
 ## Autor :computer:
 * Andrés Morales González
