@@ -5,7 +5,7 @@ En esta ocasión vamos a llevar a cabo una interconexión entre dos servidores *
 - [Conexión entre dos servidores Oracle](dblink-Oraclex2.md)
 - [Conexión entre dos servidores PostgreSQL](dblink-Postgres.md)
 - [Conexión entre los servidores de Oracle y PostgreSQL](dblink-OraclexPostgre.md)
-- 
+  
 Esto al igual que anteriormente se hará de manera unilateral, por lo que el primer servidor se conectará es el que después abre la conexión al segundo de ellos.
 
 Para esta demostración voy a usar dos máquinas que ya tenia hecha, de la interconexion entre las misma maquinas:
