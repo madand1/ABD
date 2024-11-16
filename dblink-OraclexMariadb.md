@@ -173,7 +173,7 @@ Los siguientes paquetes tienen dependencias incumplidas:
 ```
 # MariaDb
 
-En la máquina correspondiente al gestor de bases de datos MariDB, dejo en el siguiente [script](creacion-usuario-tabla-mariadb.md) los datos del usuario, y la tabla que instale, como se ve la tabla funciona perectamente.
+En la máquina correspondiente al gestor de bases de datos MariaDB, dejo en el siguiente [script](creacion-usuario-tabla-mariadb.md) los datos del usuario, y la tabla que instale, como se ve la tabla funciona perectamente.
 
 
 # Links de búsqueda
