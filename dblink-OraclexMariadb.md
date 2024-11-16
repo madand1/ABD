@@ -1,6 +1,6 @@
 # Introducción
 
-En esta ocasión vamos a llevar a cabo una interconexión entre dos servidores *Oracle 21c* y ** los cuales se situan en máquinas con _sistemas operativos_ *Debian 12*, cuya finalidad será la de permitir el acceso desde un mismo cliente a dos bases de datos distinta, como ya hemos visto con anterioridad en:
+En esta ocasión vamos a llevar a cabo una interconexión entre un *Oracle 19c* y *MariaDB* los cuales se situan en máquinas con _sistemas operativos_ *Debian 12*, cuya finalidad será la de permitir el acceso desde un mismo cliente a dos bases de datos distinta, como ya hemos visto con anterioridad en:
 
 - [Conexión entre dos servidores Oracle](dblink-Oraclex2.md)
 - [Conexión entre dos servidores PostgreSQL](dblink-Postgres.md)
