@@ -15,10 +15,14 @@
 
 ## DB-LINK
 
-- [1. DBLink:PostgreSQL-PostgreSQL](./dblink-Postgres.md)
-- [2. DBLink:Oracle-Oracle](./dblink-Oraclex2.md)
-- [3. DBLink:Oracle-PostgreSQL](./dblink-OraclexPostgre.md)
-- [4. DBLink:Oracle-MariaDB](./dblink-OraclexMariadb.md)
+- [7. DBLink:PostgreSQL-PostgreSQL](./dblink-Postgres.md)
+- [8. DBLink:Oracle-Oracle](./dblink-Oraclex2.md)
+- [9. DBLink:Oracle-PostgreSQL](./dblink-OraclexPostgre.md)
+- [10. DBLink:Oracle-MariaDB](./dblink-OraclexMariadb.md)
+
+## Práctica 2 - SQL/PLSQL
+
+- [11. Práctica 2. SQL/PLSQL](./Práctica2-SQL/PLSQL.sql)
 
 ## Autor :computer:
 * Andrés Morales González
