@@ -289,7 +289,7 @@ END;
 /
 
 -- Procedimiento para imprimir detalles de compras
-CREATE OR REPLACE PROCEDURE imprimir_compras_cliente(
+CREATE OR REPLACE PROCEDURE imprimircomprascliente(
     p_dni_cliente VARCHAR2,
     p_tipo VARCHAR2,
     p_mes NUMBER,
@@ -315,7 +315,7 @@ END;
 /
 
 -- Procedimiento principal
-CREATE OR REPLACE PROCEDURE informe_compras(
+CREATE OR REPLACE PROCEDURE informecompras(
     p_tipo IN VARCHAR2,
     p_mes IN NUMBER,
     p_anio IN NUMBER
@@ -365,7 +365,7 @@ END;
 
 ```
 SQL> SET SERVEROUTPUT ON;
-SQL> EXEC informe_compras('Telefonía', 2, 2024);
+SQL> EXEC informecompras('Telefonía', 2, 2024);
 Compras de Art??culos de Tipo Telefon??a - Mes: 2 A??o: 2024
 
 Pa??s: Espa??a
