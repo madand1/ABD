@@ -439,15 +439,15 @@ Por lo que de esta forma, va a quedar un registro de todas las operacines **DML*
 
 ---
 
-**## 4. Realiza una auditoría de grano fino para almacenar información sobre la inserción de empleados con comisión en la tabla emp de scott.**
+## 4. **Realiza una auditoría de grano fino para almacenar información sobre la inserción de empleados con comisión en la tabla emp de scott.**
 
 Ahora lo que vamos a realizar es una auditoría de grano fino, pero te estará preguntado que est, lo que te acabo de comentar pues es ni más ni menos que un acaracteristica de Oracle Database en la cual nos va a permitir regustrar cambios que se producen en los datos de una base de datos.
 
 Esta auditoria lo que hace es registrar los cambios que se estan produciendo en los mismos datos, por lo que es bastante interesante ya que nos va a permitir saber a ciencia cierta que datios y quien lo han cambiado.
 
-Por lo que para ello vamos a hacer un experimento con nuetsro usuario Scott, en este caso se va a llamar Scotty, ya que nuestro anterior soldado, por desgracia perecio enla guerra de los mil mundos.
+Por lo que para ello vamos a hacer un experimento con nuetsro usuario Scott, en este caso se va a llamar Scotty, ya que nuestro anterior soldado, por desgracia perecio en la guerra llamada GBA del IES Gonzalo Nazareno.
 
-Pero es su hijo así que no pasa nada.
+Pero es su hijo así que no pasa nada, hará honor a su nombre.
 
 Lo primero que vamos a hacer es crear un procedimiento para que, un objeto en concreto de una tabla, se audite cuando se realice una inserción en dicha tabla.
 
@@ -462,6 +462,14 @@ BEGIN
 END;
 /
 ```
+Donde:
+
+- `object_schema`: Es el esquema donde reside la tabla (en este caso, SCOTTY).
+- `object_name`: El nombre de la tabla que estamos auditando (EMP).
+- `policy_name`: Nombre de la política de auditoría (ejercicio4auditoria).
+- `audit_condition`: Condición bajo la cual se auditan los registros. En este caso, se auditarán las inserciones donde el salario (SAL) sea mayor a 2000.
+- `statement_types`: Tipos de sentencias SQL que activan la auditoría, en este caso, solo las INSERT.
+
 Por pantalla nos mostrara lo siguiente:
 
 ```sql
@@ -486,6 +494,7 @@ INSERT INTO EMP VALUES(7985, 'ANDRES', 'MORALES', 7698,TO_DATE('3-DIC-1981', 'DD
 INSERT INTO EMP VALUES(7999, 'DAVID', 'BATISTA', 7566,TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3000, NULL, 20);
 INSERT INTO EMP VALUES(8010, 'RANDY', 'ORTON', 7782,TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2100, NULL, 10);
 ```
+
 Una vez insertado a nuestros nuevos empleados con sus sueldos de **SCOTTY**, lo que vamos a comprobar desde **SYSDBA** es la auditoria de grano fino que pusimos antes, por lo que vamos a ejecutarla en este momento:
 
 ```sql
@@ -552,7 +561,9 @@ Y como podemos observar tenemos al sequito que acabamos de meter por inserciones
 
 
 ---
-**## 5. Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
+## 5. **Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
+
+---
 **## 6. Documenta las diferencias entre los valores db y db, extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
 **## 7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
 **## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
