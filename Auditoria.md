@@ -323,11 +323,235 @@ Procedimiento PL/SQL terminado correctamente.
 ---
 ## **3. Activa la auditoría de las operaciones DML realizadas por el usuario Prueba en tablas de su esquema. Comprueba su funcionamiento.**
 
+Para este ejercicio, lo que tenemos que tener en cuenta es que en esta auditoría se incluirán cualquier sentencia que modifique cualqueir dato de la base de datos, por lo que tenemos que tener claras cuales son las sentencias:
+
+- `Insert`
+- `Delete`
+- `Update`
+
+
+Por lo que para empezar la **auditoría DML** lo que tendremos que hacer es meter el siguiente comando por consola:
+
+```sql
+SQL> AUDIT INSERT TABLE, UPDATE TABLE, DELETE TABLE BY SCOTT BY ACCESS;  
+```
+Para no manchar lo que es las tablas del esquema SCOTT, lo que haré será crear lo que es una tabla y meterle registros:
+
+```sql
+SQL> CREATE TABLE PRACTICA(NOMBRE VARCHAR2(20),APELLIDO VARCHAR2(30));
+
+Tabla creada.
+
+SQL> INSERT INTO PRACTICA VALUES('Andrés','Rojas de las margaritas');
+
+1 fila creada.
+
+SQL> INSERT INTO PRACTICA VALUES('Concha','de la Rosa');
+
+1 fila creada.
+
+SQL> UPDATE PRACTICA SET APELLIDO = 'Morales' WHERE NOMBRE='Andrés';
+
+1 fila actualizada.
+
+SQL> DELETE FROM PRACTICA WHERE NOMBRE = 'Andrés';
+
+1 fila suprimida.
+
+```
+
+Una vez hecho esto lo que haré sera conectarme de nuevo como sysdba, o como administrador en este caso, será para lo que es la auditoría, con el siguiente comando:
+
+```sql
+SQL> AUDIT INSERT TABLE, UPDATE TABLE, DELETE TABLE BY SCOTT BY ACCESS;  
+
+Auditoria terminada correctamente.
+```
+
+Una vez cerrada la auditoria, lo que tendremos que hacer es proceder a ver que ha pasado mientas nosotros nos hemos estado tomando un café y nuestro usuairo favorito Scott ha estado trasteando en la base de datos, por lo que usaremos lo siguiente:
+
+```sql
+SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='C##SCOTT';
+
+```
+
+Y esto nos mostrará por pantalla lo que nuestro querido usuario ha estado haciendo en las tablas, por lo que veremos por pantalla lo siguiente:
+
+```sql
+QL> SELECT OBJ_NAME, ACTION_NAME, TIMESTAMP
+FROM DBA_AUDIT_TRAIL
+WHERE USERNAME = 'SCOTT';   2    3  
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+
+LOGON			     17/02/25
+
+
+LOGON			     20/02/25
+
+PRACTICA
+INSERT			     20/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+PRACTICA
+INSERT			     20/02/25
+
+PRACTICA
+UPDATE			     20/02/25
+
+PRACTICA
+DELETE			     20/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+
+LOGON			     17/02/25
+
+
+LOGON			     17/02/25
+
+
+LOGOFF			     17/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+
+LOGOFF			     20/02/25
+
+
+10 filas seleccionadas.
+```
+
+Por lo que de esta forma, va a quedar un registro de todas las operacines **DML** va a ejecutar el usuario **SCOTT**.
 
 ---
 
-
 **## 4. Realiza una auditoría de grano fino para almacenar información sobre la inserción de empleados con comisión en la tabla emp de scott.**
+
+Ahora lo que vamos a realizar es una auditoría de grano fino, pero te estará preguntado que est, lo que te acabo de comentar pues es ni más ni menos que un acaracteristica de Oracle Database en la cual nos va a permitir regustrar cambios que se producen en los datos de una base de datos.
+
+Esta auditoria lo que hace es registrar los cambios que se estan produciendo en los mismos datos, por lo que es bastante interesante ya que nos va a permitir saber a ciencia cierta que datios y quien lo han cambiado.
+
+Por lo que para ello vamos a hacer un experimento con nuetsro usuario Scott, en este caso se va a llamar Scotty, ya que nuestro anterior soldado, por desgracia perecio enla guerra de los mil mundos.
+
+Pero es su hijo así que no pasa nada.
+
+Lo primero que vamos a hacer es crear un procedimiento para que, un objeto en concreto de una tabla, se audite cuando se realice una inserción en dicha tabla.
+
+```sql
+BEGIN
+    DBMS_FGA.ADD_POLICY (
+        object_schema => 'SCOTTY',
+        object_name => 'EMP',
+        policy_name => 'ejercicio4auditoria',
+        audit_condition => 'SAL > 2000',
+        statement_types => 'INSERT');
+END;
+/
+```
+Por pantalla nos mostrara lo siguiente:
+
+```sql
+SQL> BEGIN
+    DBMS_FGA.ADD_POLICY (
+        object_schema => 'SCOTTY',
+        object_name => 'EMP',
+        policy_name => 'ejercicio4auditoria',
+        audit_condition => 'SAL > 2000',
+        statement_types => 'INSERT');
+END;
+/  2    3    4    5    6    7    8    9  
+
+Procedimiento PL/SQL terminado correctamente.
+```
+COmo estamos en dos terminales, y podemos hacer dos cosas a la vez lo que voamos a proceder es a coger y meter algunos datos:
+
+```sql
+INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2001, 0, 30);
+INSERT INTO EMP VALUES(7959, 'ROBY', 'RETOS', 7788,TO_DATE('12-ENE-1983', 'DD-MON-YYYY'), 1999, NULL, 20);
+INSERT INTO EMP VALUES(7985, 'ANDRES', 'MORALES', 7698,TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3395, NULL, 30);
+INSERT INTO EMP VALUES(7999, 'DAVID', 'BATISTA', 7566,TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3000, NULL, 20);
+INSERT INTO EMP VALUES(8010, 'RANDY', 'ORTON', 7782,TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2100, NULL, 10);
+```
+Una vez insertado a nuestros nuevos empleados con sus sueldos de **SCOTTY**, lo que vamos a comprobar desde **SYSDBA** es la auditoria de grano fino que pusimos antes, por lo que vamos a ejecutarla en este momento:
+
+```sql
+
+SELECT DB_USER, OBJECT_NAME, SQL_TEXT, CURRENT_USER, TIMESTAMP
+FROM DBA_FGA_AUDIT_TRAIL
+WHERE POLICY_NAME = 'EJERCICIO4AUDITORIA';
+```
+Lo he puesto de esta manera, pero se ve super mal por el formato, por lo que usare el siguiente comando, por lo menos para que se vea un poco mejor:
+
+```sql
+SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIA';
+```
+
+Ambas consultas nos van a mostrar exactamente lo mismo, pero la presentación por lo que es consola se ve horrible, y ahora lo que vemos es lo siguiente:
+
+```sql
+SQL> SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIA';
+
+SQL_TEXT
+--------------------------------------------------------------------------------
+INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-
+MON-YYYY'), 2001, 0, 30)
+
+INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-
+MON-YYYY'), 2001, 0, 30)
+
+INSERT INTO EMP VALUES(7985, 'ANDRES', 'MORALES', 7698,TO_DATE('3-DIC-1981', 'DD
+-MON-YYYY'), 3395, NULL, 30)
+
+INSERT INTO EMP VALUES(7999, 'DAVID', 'BATISTA', 7566,TO_DATE('3-DIC-1981', 'DD-
+MON-YYYY'), 3000, NULL, 20)
+
+SQL_TEXT
+--------------------------------------------------------------------------------
+
+INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
+UES (7958, 'GANSO', 'ARENOSO', 7698, TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2001,
+ 0, 30)
+
+INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
+UES (7985, 'ANDRES', 'MORALES', 7698, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3395
+, NULL, 30)
+
+INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
+UES (7999, 'DAVID', 'BATISTA', 7566, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3000,
+
+SQL_TEXT
+--------------------------------------------------------------------------------
+ NULL, 20)
+
+INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
+UES (8010, 'RANDY', 'ORTON', 7782, TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2100,
+NULL, 10)
+
+INSERT INTO EMP VALUES(8010, 'RANDY', 'ORTON', 7782,TO_DATE('23-ENE-1982', 'DD-M
+ON-YYYY'), 2100, NULL, 10)
+
+
+9 filas seleccionadas.
+```
+
+Y como podemos observar tenemos al sequito que acabamos de meter por inserciones para lo que sería etsa practica.
+
+
+---
 **## 5. Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
 **## 6. Documenta las diferencias entre los valores db y db, extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
 **## 7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
