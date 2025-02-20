@@ -24,6 +24,10 @@
 
 - [11. Práctica 2. SQL/PLSQL](./Práctica2-SQL/PLSQL.sql)
 
+## Auditoría
+
+- [12. Auditoría](./Auditoria.md)
+
 ## Autor :computer:
 * Andrés Morales González
 * :school:I.E.S. Gonzalo Nazareno :round_pushpin:(Dos Hermanas, Sevilla).
