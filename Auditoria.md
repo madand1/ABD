@@ -371,7 +371,7 @@ Auditoria terminada correctamente.
 Una vez cerrada la auditoria, lo que tendremos que hacer es proceder a ver que ha pasado mientas nosotros nos hemos estado tomando un café y nuestro usuairo favorito Scott ha estado trasteando en la base de datos, por lo que usaremos lo siguiente:
 
 ```sql
-SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='C##SCOTT';
+SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='SCOTT';
 
 ```
 
