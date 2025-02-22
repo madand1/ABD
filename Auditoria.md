@@ -1154,6 +1154,9 @@ Tambien dejo por aquí cuando tengo exito en la entrada:
 
 ![Exito en la entrada](entrada-exitosa.png)
 
+##### 2. Accesos fallidos junto con su motivo
+
+En este ejercicio yo lo que entiendo es lo mismo que en lo que al primero se refiere, la de observar los logs, por lo que lo único que se me ocurre es automatizar lo anterior, dado que en este SGBD,  no hay una función como tal a lo que Oracle se refiere como `DBA_FGA_AUDIT_TRAIL`, por lo que anteriormente accedimos a los logs de la forma manual, metiendo el comando.
 
 ##### 3. Auditoria DML
 
@@ -1277,15 +1280,26 @@ EXECUTE FUNCTION auidoria_comisiones();
 
 ```
 
-Ahora lo que hago es probarlo, insertando algun empleado:
+Ahora lo que hago es probarlo, insertando algun empleado junto con sus comisiones:
 
 ```sql
 INSERT INTO public.emp (empno, ename, job, mgr, hiredate, sal, comm, deptno)
 VALUES (7777, 'Sportacus', 'adios', 7698, '2025-02-22', 1500, 300, 30);
 
+INSERT INTO public.emp (empno, ename, job, mgr, hiredate, sal, comm, deptno)
+VALUES (7657, 'Robbie', 'adios', 7698, '2025-02-22', 1500, 759, 30);
+
+INSERT INTO public.emp (empno, ename, job, mgr, hiredate, sal, comm, deptno)
+VALUES (7677, 'messi', 'andres', 7698, '2025-02-22', 1500, 169, 30);
 ```
 
-y luego consultamos la tabla de la auditoria de la siguiente forma:
+Para que esto surja efecto le he tenidoq ue dar a mi usuario Scott los siguientes permisos de la tabla que conr¡strui:
+
+```sql
+postgres=# GRANT USAGE, SELECT ON SEQUENCE public.emp_audit_audit_id_seq TO scott;
+GRANT
+```
+Una vez hehco esto, consultamos la tabla de la auditoria de la siguiente forma:
 
 ```sql
 SELECT * FROM public.emp_audit;
@@ -1300,13 +1314,200 @@ postgres=# SELECT * FROM public.emp_audit;
         1 |  9999 | hola      | 300.00 | 2025-02-22 17:56:20.369125
         2 |  7777 | Sportacus | 300.00 | 2025-02-22 17:59:06.081495
         3 |  7777 | Sportacus | 300.00 | 2025-02-22 17:59:06.081495
-(3 filas)
+        4 |  7657 | Robbie    | 759.00 | 2025-02-22 18:36:38.400557
+        5 |  7657 | Robbie    | 759.00 | 2025-02-22 18:36:38.400557
+        6 |  7677 | messi     | 169.00 | 2025-02-22 18:41:06.861984
+        7 |  7677 | messi     | 169.00 | 2025-02-22 18:41:06.861984
+(7 filas)
+```
+Como podemos observar se ve oerfectamente reflejado.
+---
+## **8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 
+Ahora que estamos en MySQL, lo que vamos a hacer parar poder hacer un aauditopria es recurrir a `serer_audit` el cual nos va a permitir auditar todas las acciones que se hagan en dicho servidor, por lo que vamos a proceder a su instalación, por lo que vamsos a meternos como root en el servidor, y vamos a meter por comando lo siguiente `INSTALL SONAME 'server_audit'`, obviamente tdoo ello conectado a la base de datos, dejo a continuación como lo hice:
+
+![Mysql](1.png)
+
+
+Una vez hecho esto voy a proceder a hacer lo mejor que pueda los ejercicios que tenemos que realizar.
+
+##### 1. Auditoria accesos
+
+Al igual que en PostgreSQL, voy a realizar tanto el de accesos exitosos como fallidos, basicamente porque lo que hay que hacer es mirarlo en los logs al igual que en el anterior.
+
+Por lo que tendremos que ir al siguiente fichero ` /etc/mysql/mariadb.conf.d/50-server.cnf` y tendremos que desmoentar las siguientes lineas:
+
+![Configuración](3.png)
+
+Luego de haber hecho estos cambios lo que hay que hacer es crear el directorio `/var/log/mysql/` y reiniciar lo que va siendo el servidor, por lo que metemos los siguientes comandos:
+
+```bash
+andy@debian:/var/log/mysql$ sudo chown mysql: /var/log/mysql/
+andy@debian:~$ sudo systemctl restart mariadb.service 
+```
+
+y como vemos por pantalla al igual que con PostrgeSQL, vemos tanto quien tieene el acceso denegado como el que puede entrar:
+
+![Entrada exitosa y no exitosa](4.png)
+
+##### 2. Auditorias DML.
+
+Para este paso lo que vamos a tener que hacer es editar  el fichero de configuración `/etc/mysql/mariadb.conf.d/50-server.cnf`, y buscar las siguientes líneas:
+
+```bash
+# this is read by the standalone daemon and embedded servers
+[server]
+
+server_audit_events=CONNECT,QUERY,TABLE
+server_audit_logging=ON
+server_audit_incl_users=scott
+server_audit_file_path=/var/log/mysql/audit.log
+
+```
+- Donde:
+
+- **`server_audit_events=CONNECT,QUERY,TABLE`**: Registra tres tipos de actividades:
+  - Conexiones (`CONNECT`)
+  - Consultas (`QUERY`)
+  - Acciones sobre las tablas (`TABLE`)
+
+- **`server_audit_logging=ON`**: Activa el registro de esas actividades.
+
+- **`server_audit_incl_users=scott`**: Solo se registran las actividades del usuario `scott`.
+
+Luego de esto lo que hacemos es un reinicio del servidor de Mysql.
+`sudo systemctl restart mariadb.server`
+
+Por lo que dejo por aqui el [script](./scott-mysql.sql) de la creacion del usuario scott.
+
+Ahora nos conectamos como el usuario scott, y tendremos que hacer algunas sentencias SQL.
+
+```sql
+andy@debian:~$ sudo mysql -u scott -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 31
+Server version: 10.11.6-MariaDB-0+deb12u1-log Debian 12
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| scott              |
++--------------------+
+2 rows in set (0,001 sec)
+
+MariaDB [(none)]> use scott;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+
+-- Luego meto esto.
+INSERT INTO scott.emp VALUES(7875, 'DJANGO', 'PERICO', 7902, '1980-12-17', 975, NULL, 20);
+UPDATE scott.emp SET sal = 1509 WHERE empno = 7875;
+DELETE FROM scott.emp WHERE empno = 7875;
+
+```
+Una vez hecho esto vamos a ver loslogs con el siguiente comando:
+
+`sudo tail /var/log/mysql/audit.log`
+
+Y esto nos sale por pantalla:
+
+![mysql dml](5.png)
+
+
+##### 3. Auditoria grano fino.
+
+Ahora como en las ocasiones anteriores, vamos a crear una tabla donde vamos a almacenar los datos de dicha auditoria, donde tendremos que poner el ID del empleado, el nombre, la comisisón, fecha de insersción...
+
+```sql
+
+CREATE TABLE scott.emp_auditoria (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    empno INT,
+    ename VARCHAR(10),
+    comm DECIMAL(7,2),
+    action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    action_type VARCHAR(10) 
+);
+```
+
+Por pantalla veremos lo siguiente:
+
+```sql
+MariaDB [scott]> CREATE TABLE scott.emp_auditoria (
+    ->     audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     empno INT,
+    ->     ename VARCHAR(10),
+    ->     comm DECIMAL(7,2),
+    ->     action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ->     action_type VARCHAR(10) 
+    -> );
+Query OK, 0 rows affected (0,040 sec)
+
+MariaDB [scott]> 
 ```
 
 
+Luego creamos un trigger para el registro de las inserciones de empleados con comisiones este se va a activar cada vez que se vaya a realizar un inserción en la tabla de empleados, y verificará si el cmapo comm tiene un valor distinto de NULL, es decir, que el empleado tiene una comisión.
+
+```sql
+DELIMITER $$
+
+CREATE TRIGGER audit_emp_inserciom
+AFTER INSERT ON scott.emp
+FOR EACH ROW
+BEGIN
+    IF NEW.comm IS NOT NULL THEN
+        INSERT INTO scott.emp_auditoria (empno, ename, comm, action_type)
+        VALUES (NEW.empno, NEW.ename, NEW.comm, 'INSERT');
+    END IF;
+END $$
+
+DELIMITER ;
+
+```
+
+Y esto lo probaremos con el siguiente candidato de nuestros juegos del hambre, aqui lo presento:
+
+```sql
+INSERT INTO scott.emp VALUES (7880, 'LEVI', 'ACKERMAN', 7839, '1981-04-02', 3000, 500, 30);
+INSERT INTO scott.emp VALUES (7881, 'Nike', 'ACKERMAN', 7839, '1981-04-02', 3000, 500, 30);
+```
+
+Y luego seleccionamos con un select, la tabla y vemso como etsa se va rellenando:
+
+```sql
+MariaDB [scott]> select * from scott.emp_auditoria;
++----------+-------+-------+--------+---------------------+-------------+
+| audit_id | empno | ename | comm   | action_time         | action_type |
++----------+-------+-------+--------+---------------------+-------------+
+|        1 |  7880 | LEVI  | 500.00 | 2025-02-22 20:13:24 | INSERT      |
++----------+-------+-------+--------+---------------------+-------------+
+1 row in set (0,000 sec)
+
+```
+
+Y si metemos otro poddemos observar como verdaderamente la comprobación que hacemos tiene éxito:
+
+```sql
+MariaDB [scott]> select * from scott.emp_auditoria;
++----------+-------+-------+--------+---------------------+-------------+
+| audit_id | empno | ename | comm   | action_time         | action_type |
++----------+-------+-------+--------+---------------------+-------------+
+|        1 |  7880 | LEVI  | 500.00 | 2025-02-22 20:13:24 | INSERT      |
+|        2 |  7881 | Nike  | 500.00 | 2025-02-22 20:15:54 | INSERT      |
++----------+-------+-------+--------+---------------------+-------------+
+2 rows in set (0,000 sec)
+```
 ---
-**## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 **## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
 **## 11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
