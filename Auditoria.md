@@ -563,8 +563,435 @@ Y como podemos observar tenemos al sequito que acabamos de meter por inserciones
 ---
 ## 5. **Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
 
+En las auditorías de un SGBD, podemos diferenciar dos tipos principales de auditoría:
+
+- `Auditoría by access`: Registra cada vez que ocurre una acción específica, sin importar quién la realice o cuándo suceda. Es más detallada que la auditoría By Session, ya que permite un seguimiento preciso de eventos individuales.
+
+
+- `Auditoría by session`: Registra toda la actividad realizada por un usuario durante su sesión. En lugar de auditar acciones individuales, se monitorea todo lo que sucede desde que el usuario inicia sesión hasta que la finaliza.
+
+
+#### Comprobaciones
+
+Ahora lo que haremos será algunas comprobaciones para ambas auditorias con nuestro super agente **SCOTTY**, por lo que vamos a proceder a realizarlas:
+
+- ```By Session```
+
+Para este caso, ejecutaremos el siguiente comando en SQL como usuario SYSDBA:
+
+```sql
+SQL> AUDIT INSERT TABLE, UPDATE TABLE, DELETE TABLE BY SCOTTY BY SESSION;      
+
+Auditoria terminada correctamente.
+
+```
+Ahora, en otra terminal, nos conectaremos como el usuario SCOTTY y realizaremos algunas operaciones sobre la tabla DEPT.
+
+- Lo primero que hacemos es realizar alguna incersiones een la tabla DEPT:
+
+```
+SQL> INSERT INTO DEPT VALUES (70, 'ORCOS', 'ESPACIALES');
+
+1 fila creada.
+
+SQL> INSERT INTO DEPT VALUES (90, 'ANGELES', 'GUERRERAS');
+
+1 fila creada.
+
+```
+- Segundo hacemos una acutualización de la localización de la inserción con valor 90:
+
+```sql
+SQL> UPDATE DEPT SET loc='TERRA' WHERE deptno=90;
+
+1 fila actualizada.
+```
+
+- Tercero borramos la fila que hemos metido referentes a los ángeles, ya que en esta casa somos equipo Orcos:
+
+```sql
+
+SQL> DELETE FROM dept WHERE deptno=90;
+
+1 fila suprimida.
+
+```
+
+Para verificar los eventos registrados, volvemos a conectarnos como SYSDBA y ejecutamos la siguiente consulta:
+
+```sql
+SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='SCOTTY';
+```
+Y el resultado que nos dará será el siguiente:
+
+```sql
+SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='SCOTTY';
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+SESSION REC		     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+SESSION REC		     22/02/25
+
+
+SQL> 
+```
+
+- Auditoría by access
+
+ara este caso, ejecutaremos el siguiente comando en SQL como usuario SYSDBA:
+
+```sql
+SQL> AUDIT INSERT TABLE, UPDATE TABLE, DELETE TABLE BY SCOTTY BY ACCESS;
+
+Auditoria terminada correctamente.
+
+```
+
+Ahora, en otra terminal, nos conectaremos como el usuario SCOTTY y realizaremos algunas operaciones sobre la tabla DEPT.
+
+- Lo primero que hacemos es realizar alguna incersiones een la tabla DEPT:
+
+```sql
+SQL> INSERT INTO DEPT VALUES (70, 'ORCOS', 'ESPACIALES');
+
+1 fila creada.
+
+SQL> INSERT INTO DEPT VALUES (90, 'ANGELES', 'GUERRERAS');
+
+1 fila creada.
+
+```
+- Segundo hacemos una acutualización de la localización de la inserción con valor 90:
+
+```sql
+SQL> UPDATE DEPT SET loc='TERRA' WHERE deptno=90;
+
+1 fila actualizada.
+```
+
+- Tercero borramos la fila que hemos metido referentes a los ángeles, ya que en esta casa somos equipo Orcos:
+
+```sql
+
+SQL> DELETE FROM dept WHERE deptno=90;
+
+1 fila suprimida.
+
+```
+
+Luegod de esto lo que tendremos que hacer es volver a la terminal de SYSDBA, y ejecutar lo siguiente por línea de comando:
+
+```sql
+SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='SCOTTY';
+```
+
+y esto es lo que nos muestra por pantalla:
+
+```sql
+SQL> SELECT obj_name, action_name, timestamp FROM dba_audit_object WHERE username='SCOTTY';
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+INSERT			     22/02/25
+
+DEPT
+INSERT			     22/02/25
+
+DEPT
+UPDATE			     22/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+DELETE			     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+SESSION REC		     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+DEPT
+SESSION REC		     22/02/25
+
+
+OBJ_NAME
+--------------------------------------------------------------------------------
+ACTION_NAME		     TIMESTAM
+---------------------------- --------
+DEPT
+SESSION REC		     22/02/25
+
+
+10 filas seleccionadas.
+```
+
+
+Como conclusión:
+
+📌 **Auditoría By Access**
+
+- Registra cada vez que ocurre una acción específica, sin importar quién la realice o cuándo suceda.
+
+- Es más detallada que la auditoría By Session, ya que permite un seguimiento preciso de eventos individuales.
+
+📌 **Auditoría By Session**
+
+- Registra toda la actividad realizada por un usuario durante su sesión.
+
+- En lugar de auditar acciones individuales, monitorea todo lo que sucede desde que el usuario inicia sesión hasta que la finaliza.
 ---
-**## 6. Documenta las diferencias entre los valores db y db, extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
+
+## **6. Documenta las diferencias entre los valores db y db_extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
+
+Lo primero que haremos mención sera al parametro `AUDIT_TRAIL` en Oracle, es el que permite **controlar cómo se almacenan los registros de auditoria** en la base de datos.
+
+Ahora vamos a explicar dos valores bastante importantes de este parametro que acabamos de hacer mención:
+
+- `AUDIT_TRAIL = DB`
+
+📌 ¿Qué hace?
+
+- Guarda los registros de auditoría en la base de datos, dentro de la tabla SYS.AUD$.
+- No almacena información sobre los comandos SQL completos, solo los eventos auditados.
+- Se usa cuando queremos gestionar la auditoría desde la propia base de datos.
+
+📌 Importante:
+
+- Si la base de datos se inicia en modo solo lectura, este parámetro cambia automáticamente a OS (almacenando la auditoría en el sistema operativo).
+
+
+- `AUDIT_TRAIL = DB_EXTENDED`
+
+📌 ¿Qué hace?
+
+- Hace lo mismo que DB, pero con más detalles.
+- Además de los registros básicos, guarda el texto completo de las sentencias SQL ejecutadas.
+- También almacena información adicional, como valores de enlaces SQL y políticas de seguridad de Oracle Virtual Private Database (VPD).
+
+📌 Importante:
+
+- Si la base de datos está en modo solo lectura, este parámetro también cambia automáticamente a OS.
+
+
+Dejaré por aquí un cuadro para saber cual elegir dependiendo de las necesidades:
+
+| Valor            | ¿Dónde se almacenan los registros? | ¿Qué información guarda?                        |
+|-----------------|----------------------------------|------------------------------------------------|
+| `DB`            | Tabla `SYS.AUD$` en la base de datos | Eventos auditados (básico)                     |
+| `DB_EXTENDED`   | Tabla `SYS.AUD$` en la base de datos | Eventos auditados + Texto SQL completo + Valores de enlaces SQL |
+
+En conclusión si necesItamoS un registro super detallado, de las consultas SQL, usaremos `DB_EXTENDED`.
+
+Si solo necesitamos un regustro básico, usaremos `DB`.
+
+
+Ahora vamos a hacer unas cuantas de comprobaciones, por lo que primero que vamos a hacer es ver en que valor tenemos `AUDIT_TRAIL`, como ya hicimos mención al comando lo vuelvo a dejar por aqui:
+
+```sql
+SHOW PARAMETER AUDIT_TRAIL;
+```
+Y esto nos mostrará por pantalla lo siguiente:
+
+```sql
+
+SQL> SHOW PARAMETER AUDIT_TRAIL;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+audit_trail			     string	 DB
+SQL> 
+```
+
+COmo podemos observar el `audit_trail` ya se encuentra con el valor `DB`, por lo que voy a ejecutar sentencias en nuestro conejillo de indias llamado **SCOTTY** para poder regustarrlo y hacer una comprobación de datos, por lo que dejo por aquí laas sentencias que hare:
+```sql
+SQL> INSERT INTO DEPT VALUES (90, 'ANGELES', 'GUERRERAS');
+
+1 fila creada.
+
+SQL> UPDATE DEPT SET loc='TERRA' WHERE deptno=90;
+
+1 fila actualizada.
+
+SQL> DELETE FROM dept WHERE deptno=90;
+
+1 fila suprimida.
+```
+
+Luego de hacer las inserciones, lo que tendremos que hacer es desde SYSDBA es realizar la siguiente consulta:
+
+```sql
+SQL> SELECT OS_USERNAME, USERNAME, USERHOST, TERMINAL, ACTION_NAME, SESSIONID, EXTENDED_TIMESTAMP, SQL_TEXT
+FROM DBA_AUDIT_TRAIL
+WHERE USERNAME = 'SCOTTY'
+ORDER BY EXTENDED_TIMESTAMP DESC;
+```
+
+Esto nos va a mostrar por pantalla lo siguiente:
+
+
+| OS_USERNAME | USERNAME | USERHOST | TERMINAL | ACTION_NAME  | SESSIONID | EXTENDED_TIMESTAMP              | SQL_TEXT |
+|------------|----------|----------|----------|-------------|----------|------------------------------|----------|
+| oracle     | SCOTTY   | madand1  | pts/3    | DELETE      | 590023   | 22/02/25 10:41:33,291820 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | UPDATE      | 590023   | 22/02/25 10:41:25,561355 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 590023   | 22/02/25 10:41:15,729080 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 590023   | 22/02/25 10:41:01,764152 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 590023   | 22/02/25 10:40:39,956359 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 590023   | 22/02/25 10:39:51,851913 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 590023   | 22/02/25 10:39:15,693490 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | DELETE      | 580021   | 22/02/25 10:13:44,488291 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | UPDATE      | 580021   | 22/02/25 10:13:38,933027 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 580021   | 22/02/25 10:13:33,291861 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | INSERT      | 580021   | 22/02/25 10:13:27,923023 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 580020   | 22/02/25 10:11:39,112146 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 580020   | 22/02/25 10:11:31,145096 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 570020   | 22/02/25 10:02:59,026681 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 570020   | 22/02/25 10:01:33,904076 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 570020   | 22/02/25 09:59:17,185163 +01:00 | 0        |
+| oracle     | SCOTTY   | madand1  | pts/3    | SESSION REC | 570020   | 22/02/25 09:57:32,441784 +01:00 | 0        |
+
+**17 filas seleccionadas.**
+
+
+Como podemos observar tenemos el campo vacio, o mejor dicho con valor 0 en la columna ``SQL_TEXT``, una vez hecho esto lo que vamos a proceder es a hacerlo con el parametro `DB_EXTENDED`, por lo que para ello vamos a proceder a meter el siguiente comando SQL:
+
+```sql
+ALTER SYSTEM SET audit_trail = db,extended SCOPE=SPFILE;
+```
+
+Y veremos por pantalla lo siguiente:
+
+```sql
+SQL> ALTER SYSTEM SET audit_trail = db,extended SCOPE=SPFILE;
+
+Sistema modificado.
+```
+A continuación hacemos un reinicio de la base de datos, con los siguienets comandos:
+
+```sql
+SQL> SHUTDOWN IMMEDIATE;
+Base de datos cerrada.
+Base de datos desmontada.
+Instancia ORACLE cerrada.
+SQL> STARTUP;
+Instancia ORACLE iniciada.
+
+Total System Global Area 1644164936 bytes
+Fixed Size		    9135944 bytes
+Variable Size		 1107296256 bytes
+Database Buffers	  520093696 bytes
+Redo Buffers		    7639040 bytes
+Base de datos montada.
+Base de datos abierta.
+```
+
+Y a continuación hacemos una comprobación del cambio:
+
+```sql
+SQL>  SHOW PARAMETER audit_trail;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+audit_trail			     string	 DB, EXTENDED
+SQL> 
+
+```
+
+Una vez hecho esto, pues vamos a hacer como anteriormente meter algunos registros, metere los mismos por comodidad y procedere a comprobar las diferencias:
+
+Desde el usuario **SCOTTY**:
+
+```sql
+SQL> CONNECT SCOTTY/tiger@localhost:1521/ORCLPDB1;
+ERROR:
+ORA-28002: la contrase?a vencera en 7 dias
+
+
+Conectado.
+SQL> INSERT INTO DEPT VALUES (90, 'ANGELES', 'GUERRERAS');
+
+1 fila creada.
+
+SQL> UPDATE DEPT SET loc='TERRA' WHERE deptno=90;
+
+1 fila actualizada.
+
+SQL> DELETE FROM dept WHERE deptno=90;
+
+1 fila suprimida.
+```
+
+Y luego nos vamos al usuario SYSDBA, y ejecutamos lo siguiente:
+
+```sql
+SQL> SELECT OS_USERNAME, USERNAME, USERHOST, TERMINAL, SES_ACTIONS, ACTION_NAME, SESSIONID, EXTENDED_TIMESTAMP, INSTANCE_NUMBER, OS_PROCESS, RETURNCODE, SQL_BIND, SQL_TEXT
+FROM DBA_AUDIT_TRAIL
+WHERE USERNAME = 'SCOTTY'
+ORDER BY EXTENDED_TIMESTAMP DESC;  2    3    4  
+```
+
+Y esto nos muestra por pantall lo siguiente:
+
+| OS_USERNAME | USERNAME | USERHOST | TERMINAL | ACTION_NAME | SESSIONID | EXTENDED_TIMESTAMP           | INSTANCE_NUMBER | OS_PROCESS | RETURNCODE | SQL_TEXT                                      |
+|------------|---------|---------|---------|-------------|-----------|-----------------------------|----------------|------------|-----------|-----------------------------------------------|
+| oracle     | SCOTTY  | madand1 | pts/3   | DELETE      | 600020    | 22/02/25 11:01:43,382140 +01:00 | 0              | 1678       | 0         | DELETE FROM dept WHERE deptno=90              |
+| oracle     | SCOTTY  | madand1 | pts/3   | UPDATE      | 600020    | 22/02/25 11:01:37,887797 +01:00 | 0              | 1678       | 0         | UPDATE DEPT SET loc='TERRA' WHERE deptno=90  |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 600020    | 22/02/25 11:01:27,576251 +01:00 | 0              | 1678       | 0         | INSERT INTO DEPT VALUES (90, 'ANGELES', 'GUERRERAS') |
+| oracle     | SCOTTY  | madand1 | pts/3   | DELETE      | 590023    | 22/02/25 10:41:33,291820 +01:00 | 0              | 1281       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | UPDATE      | 590023    | 22/02/25 10:41:25,561355 +01:00 | 0              | 1281       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 590023    | 22/02/25 10:41:15,729080 +01:00 | 0              | 1281       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 590023    | 22/02/25 10:41:01,764152 +01:00 | 0              | 1281       | 1         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 590023    | 22/02/25 10:40:39,956359 +01:00 | 0              | 1281       | 2291      |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 590023    | 22/02/25 10:39:51,851913 +01:00 | 0              | 1281       | 2291      |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 590023    | 22/02/25 10:39:15,693490 +01:00 | 0              | 1281       | 1438      |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | DELETE      | 580021    | 22/02/25 10:13:44,488291 +01:00 | 0              | 1148       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | UPDATE      | 580021    | 22/02/25 10:13:38,933027 +01:00 | 0              | 1148       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 580021    | 22/02/25 10:13:33,291861 +01:00 | 0              | 1148       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | INSERT      | 580021    | 22/02/25 10:13:27,923023 +01:00 | 0              | 1148       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 580020    | 22/02/25 10:11:39,112146 +01:00 | 0              | 1141       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 580020    | 22/02/25 10:11:31,145096 +01:00 | 0              | 1141       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 570020    | 22/02/25 10:02:59,026681 +01:00 | 0              | 1117       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 570020    | 22/02/25 10:01:33,904076 +01:00 | 0              | 1117       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 570020    | 22/02/25 09:59:17,185163 +01:00 | 0              | 1117       | 0         |                                               |
+| oracle     | SCOTTY  | madand1 | pts/3   | SESSION REC | 570020    | 22/02/25 09:57:32,441784 +01:00 | 0              | 1117       | 0         |                                               |
+
+
+Y como podemos apreciar la columna `SQL_TEXT` se ha rellenado con lo que hicimos, es decir nos ha mostrado las sentencias que se han llevado a cabo.
+
+
 **## 7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
 **## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 **## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
