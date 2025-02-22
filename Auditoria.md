@@ -82,7 +82,7 @@ NAME				     TYPE	 VALUE
 audit_trail			     string	 DB
 
 ```
-- **Nota**: Dejo por aquí un [script](./Auditoria.md) en el cual tengo que hacerlo cuando deshabilito en mi Oracle.
+- **Nota**: Dejo por aquí un [script](./habilitar.md) en el cual tengo que hacerlo cuando deshabilito en mi Oracle.
 
 
 Ahora que asumimos que la auditoría está activada, vamos a plantear un caso práctico basado en una situación real. En este caso, para registrar los intentos fallidos de acceso a la base de datos, será necesario tener habilitada la auditoría de inicio de sesión, específicamente la auditoría de intentos fallidos al sistema.

@@ -1,4 +1,4 @@
-- Deshabiliatr una auditoria:
+- Deshabilitar una auditoria:
 
 ```sql
 SQL> CONN / AS SYSDBA
