@@ -491,7 +491,7 @@ Procedimiento PL/SQL terminado correctamente.
 
 
 ```
-COmo estamos en dos terminales, y podemos hacer dos cosas a la vez lo que voamos a proceder es a coger y meter algunos datos:
+Como estamos en dos terminales, y podemos hacer dos cosas a la vez lo que voamos a proceder es a coger y meter algunos datos:
 
 ```sql
 INSERT INTO EMP VALUES(7958, 'CARLOS', 'DEV', 7698, TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2200, 500, 30);
@@ -545,7 +545,7 @@ ON-YYYY'), 3200, 300, 20)
 
 ```
 
-Y como podemos observar tenemos al sequito que acabamos de meter por inserciones para lo que sería etsa practica.
+Y como podemos observar tenemos al sequito que acabamos de meter por inserciones para lo que sería esta práctica.
 
 
 ---
@@ -1303,6 +1303,8 @@ postgres=# SELECT * FROM public.emp_audit;
 (3 filas)
 
 ```
+
+
 ---
 **## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 **## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
