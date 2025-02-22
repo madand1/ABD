@@ -17,7 +17,10 @@ Una vez dicho esto, voy a proceder a realizar la práctica de auditoría de base
 ---
 
 # Actividades.
-## **1. Activa desde SQL*Plus la auditoría de los intentos de acceso no exitosos al sistema. Comprueba su funcionamiento.**
+
+# Oracle
+
+### **1. Activa desde SQL*Plus la auditoría de los intentos de acceso no exitosos al sistema. Comprueba su funcionamiento.**
 
 Para este ejercicio lo que voy a hacer es entrar en sqlplus, como hemos hecho hasta ahora, por lo que en mi caso dejo este [script](https://github.com/alejandrolf20/ABD_Usuarios/blob/main/Alumno4/oracle-pasos.md) para poder entrar.
 
@@ -183,7 +186,7 @@ Obviamente hay más codigos de errores, por lo que voy a dejar por aquí una lis
 
 
 ---
-## **2. Realiza un procedimiento en PL/SQL que te muestre los accesos fallidos junto con el motivo de los mismos, transformando el código de error almacenado en un mensaje de texto comprensible. Contempla todos los motivos posibles para que un acceso sea fallido.**
+### **2. Realiza un procedimiento en PL/SQL que te muestre los accesos fallidos junto con el motivo de los mismos, transformando el código de error almacenado en un mensaje de texto comprensible. Contempla todos los motivos posibles para que un acceso sea fallido.**
 
 Para este ejercicio lo que voy a hacer es que nos traduzca lo que son los codigo que vimos antes por pantalla, es decir esto:
 
@@ -321,7 +324,7 @@ Procedimiento PL/SQL terminado correctamente.
 ```
 
 ---
-## **3. Activa la auditoría de las operaciones DML realizadas por el usuario Prueba en tablas de su esquema. Comprueba su funcionamiento.**
+### **3. Activa la auditoría de las operaciones DML realizadas por el usuario Prueba en tablas de su esquema. Comprueba su funcionamiento.**
 
 Para este ejercicio, lo que tenemos que tener en cuenta es que en esta auditoría se incluirán cualquier sentencia que modifique cualqueir dato de la base de datos, por lo que tenemos que tener claras cuales son las sentencias:
 
@@ -439,7 +442,7 @@ Por lo que de esta forma, va a quedar un registro de todas las operacines **DML*
 
 ---
 
-## 4. **Realiza una auditoría de grano fino para almacenar información sobre la inserción de empleados con comisión en la tabla emp de scott.**
+### **4. Realiza una auditoría de grano fino para almacenar información sobre la inserción de empleados con comisión en la tabla emp de scott.**
 
 Ahora lo que vamos a realizar es una auditoría de grano fino, pero te estará preguntado que est, lo que te acabo de comentar pues es ni más ni menos que un acaracteristica de Oracle Database en la cual nos va a permitir regustrar cambios que se producen en los datos de una base de datos.
 
@@ -456,8 +459,8 @@ BEGIN
     DBMS_FGA.ADD_POLICY (
         object_schema => 'SCOTTY',
         object_name => 'EMP',
-        policy_name => 'ejercicio4auditoria',
-        audit_condition => 'SAL > 2000',
+        policy_name => 'ejercicio4auditoriacomision',
+        audit_condition => 'COMM IS NOT NULL',
         statement_types => 'INSERT');
 END;
 /
@@ -467,7 +470,7 @@ Donde:
 - `object_schema`: Es el esquema donde reside la tabla (en este caso, SCOTTY).
 - `object_name`: El nombre de la tabla que estamos auditando (EMP).
 - `policy_name`: Nombre de la política de auditoría (ejercicio4auditoria).
-- `audit_condition`: Condición bajo la cual se auditan los registros. En este caso, se auditarán las inserciones donde el salario (SAL) sea mayor a 2000.
+- `audit_condition`: Condición para la auditoría (cuando la comisión no sea nula)
 - `statement_types`: Tipos de sentencias SQL que activan la auditoría, en este caso, solo las INSERT.
 
 Por pantalla nos mostrara lo siguiente:
@@ -477,22 +480,25 @@ SQL> BEGIN
     DBMS_FGA.ADD_POLICY (
         object_schema => 'SCOTTY',
         object_name => 'EMP',
-        policy_name => 'ejercicio4auditoria',
-        audit_condition => 'SAL > 2000',
+        policy_name => 'ejercicio4auditoriacomision',
+        audit_condition => 'COMM IS NOT NULL',
         statement_types => 'INSERT');
 END;
 /  2    3    4    5    6    7    8    9  
 
 Procedimiento PL/SQL terminado correctamente.
+
+
+
 ```
 COmo estamos en dos terminales, y podemos hacer dos cosas a la vez lo que voamos a proceder es a coger y meter algunos datos:
 
 ```sql
-INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2001, 0, 30);
-INSERT INTO EMP VALUES(7959, 'ROBY', 'RETOS', 7788,TO_DATE('12-ENE-1983', 'DD-MON-YYYY'), 1999, NULL, 20);
-INSERT INTO EMP VALUES(7985, 'ANDRES', 'MORALES', 7698,TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3395, NULL, 30);
-INSERT INTO EMP VALUES(7999, 'DAVID', 'BATISTA', 7566,TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3000, NULL, 20);
-INSERT INTO EMP VALUES(8010, 'RANDY', 'ORTON', 7782,TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2100, NULL, 10);
+INSERT INTO EMP VALUES(7958, 'CARLOS', 'DEV', 7698, TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2200, 500, 30);
+INSERT INTO EMP VALUES(7959, 'MARTIN', 'DEV', 7788, TO_DATE('12-ENE-1983', 'DD-MON-YYYY'), 2100, NULL, 20);
+INSERT INTO EMP VALUES(7985, 'LINA', 'DESARROLLO', 7698, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3300, 700, 10);
+INSERT INTO EMP VALUES(7999, 'ROBERTO', 'DEV', 7566, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3200, 300, 20);
+INSERT INTO EMP VALUES(8010, 'SUSANA', 'PROG', 7782, TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2400, NULL, 30);
 ```
 
 Una vez insertado a nuestros nuevos empleados con sus sueldos de **SCOTTY**, lo que vamos a comprobar desde **SYSDBA** es la auditoria de grano fino que pusimos antes, por lo que vamos a ejecutarla en este momento:
@@ -501,67 +507,49 @@ Una vez insertado a nuestros nuevos empleados con sus sueldos de **SCOTTY**, lo 
 
 SELECT DB_USER, OBJECT_NAME, SQL_TEXT, CURRENT_USER, TIMESTAMP
 FROM DBA_FGA_AUDIT_TRAIL
-WHERE POLICY_NAME = 'EJERCICIO4AUDITORIA';
+WHERE POLICY_NAME = 'EJERCICIO4AUDITORIACOMISION';
 ```
 Lo he puesto de esta manera, pero se ve super mal por el formato, por lo que usare el siguiente comando, por lo menos para que se vea un poco mejor:
 
 ```sql
-SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIA';
+SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIACOMISION';
 ```
 
 Ambas consultas nos van a mostrar exactamente lo mismo, pero la presentación por lo que es consola se ve horrible, y ahora lo que vemos es lo siguiente:
 
 ```sql
-SQL> SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIA';
+SQL> SELECT sql_text FROM dba_fga_audit_trail WHERE policy_name='EJERCICIO4AUDITORIACOMISION';
 
 SQL_TEXT
 --------------------------------------------------------------------------------
-INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-
-MON-YYYY'), 2001, 0, 30)
+INSERT INTO EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO)
+VALUES (8001, 'JUAN', 'DEV', 7839, TO_DATE('1-FEB-2025', 'DD-MON-YYYY'), 3000, 5
+00, 30)
 
-INSERT INTO EMP VALUES(7958, 'GANSO', 'ARENOSO', 7698,TO_DATE('8-SEP-1981', 'DD-
-MON-YYYY'), 2001, 0, 30)
+INSERT INTO EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO)
+VALUES (8001, 'JUAN', 'DEV', 7839, TO_DATE('1-FEB-2025', 'DD-MON-YYYY'), 3000, 5
+00, 10)
 
-INSERT INTO EMP VALUES(7985, 'ANDRES', 'MORALES', 7698,TO_DATE('3-DIC-1981', 'DD
--MON-YYYY'), 3395, NULL, 30)
+INSERT INTO EMP VALUES(7985, 'LINA', 'RAMOS', 7698, TO_DATE('3-DIC-1981', 'DD-MO
+N-YYYY'), 3300, 700, 10)
 
-INSERT INTO EMP VALUES(7999, 'DAVID', 'BATISTA', 7566,TO_DATE('3-DIC-1981', 'DD-
-MON-YYYY'), 3000, NULL, 20)
 
 SQL_TEXT
 --------------------------------------------------------------------------------
+INSERT INTO EMP VALUES(7999, 'ROBERTO', 'DEV', 7566, TO_DATE('3-DIC-1981', 'DD-M
+ON-YYYY'), 3200, 300, 20)
 
-INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
-UES (7958, 'GANSO', 'ARENOSO', 7698, TO_DATE('8-SEP-1981', 'DD-MON-YYYY'), 2001,
- 0, 30)
-
-INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
-UES (7985, 'ANDRES', 'MORALES', 7698, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3395
-, NULL, 30)
-
-INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
-UES (7999, 'DAVID', 'BATISTA', 7566, TO_DATE('3-DIC-1981', 'DD-MON-YYYY'), 3000,
-
-SQL_TEXT
---------------------------------------------------------------------------------
- NULL, 20)
-
-INSERT INTO SCOTTY.EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO) VAL
-UES (8010, 'RANDY', 'ORTON', 7782, TO_DATE('23-ENE-1982', 'DD-MON-YYYY'), 2100,
-NULL, 10)
-
-INSERT INTO EMP VALUES(8010, 'RANDY', 'ORTON', 7782,TO_DATE('23-ENE-1982', 'DD-M
-ON-YYYY'), 2100, NULL, 10)
+INSERT INTO EMP VALUES(7999, 'ROBERTO', 'DEV', 7566, TO_DATE('3-DIC-1981', 'DD-M
+ON-YYYY'), 3200, 300, 20)
 
 
-9 filas seleccionadas.
 ```
 
 Y como podemos observar tenemos al sequito que acabamos de meter por inserciones para lo que sería etsa practica.
 
 
 ---
-## 5. **Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
+### **5. Explica la diferencia entre auditar una operación by access o by session ilustrándolo con ejemplos.**
 
 En las auditorías de un SGBD, podemos diferenciar dos tipos principales de auditoría:
 
@@ -775,7 +763,7 @@ Como conclusión:
 - En lugar de auditar acciones individuales, monitorea todo lo que sucede desde que el usuario inicia sesión hasta que la finaliza.
 ---
 
-## **6. Documenta las diferencias entre los valores db y db_extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
+### **6. Documenta las diferencias entre los valores db y db_extended del parámetro audit_trail de ORACLE. Demuéstralas poniendo un ejemplo de la información sobre una operación concreta recopilada con cada uno de ellos.**
 
 Lo primero que haremos mención sera al parametro `AUDIT_TRAIL` en Oracle, es el que permite **controlar cómo se almacenan los registros de auditoria** en la base de datos.
 
@@ -998,7 +986,324 @@ Estoy metiendo las tablas en este formato porque la salida que da el **SQLPLUS**
 
 
 ---
-**## 7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
+
+# PostgreSQL 
+### **7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
+
+En este apartado voy a volver a copiar los enunciados anteriores, para llevar a cabo este ejercicio.
+
+En el SGBD llamado **PostgreSQL**, un aauditoría se puede realizar a traǘes de las extensiones, como puede ser `Audit Trigger` o bien `pgAudit`, una vez dicho esto, lo que vamos a hacer es instalar la extensión `Audit Trigger`, en nuestra base de datos, pero esto se puede instalar en cualquier base de datos.
+
+Por lo que vamos a proceder a recoger esta herramienta con el siguiente comando:
+
+```bash
+wget https://raw.githubusercontent.com/2ndQuadrant/audit-trigger/master/audit.sql
+```
+
+Una vez descargada, tendremos que ingresar en el servidor PostgreSQL y ejecutar lo siguiente:
+
+```sql
+\i audit.sql
+```
+
+Y nos aparecera esto por pantalla:
+
+```sql
+andy@postgreSQL:~$ sudo -u postgres psql
+psql (15.9 (Debian 15.9-0+deb12u1))
+Digite «help» para obtener ayuda.
+
+postgres=# \i audit.sql
+CREATE EXTENSION
+CREATE SCHEMA
+REVOKE
+COMMENT
+CREATE TABLE
+REVOKE
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+COMMENT
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE FUNCTION
+COMMENT
+CREATE FUNCTION
+COMMENT
+CREATE FUNCTION
+CREATE FUNCTION
+COMMENT
+CREATE VIEW
+COMMENT
+postgres=# 
+
+```
+
+Antes nos daba un problema de permisos, por lo que nos daba este error:
+
+```sql
+andy@postgreSQL:~$ sudo -u postgres psql
+could not change directory to "/home/andy": Permiso denegado
+psql (15.9 (Debian 15.9-0+deb12u1))
+Type "help" for help.
+
+postgres=# \i /home/andy/audit.sql
+/home/andy/audit.sql: Permiso denegado
+postgres=# 
+\q
+
+```
+
+Esto lo hemos arregalando usando el siguiente comando:
+
+```sql
+chmod 755 /home/andy
+```
+
+Bien una vez hecho esto voy a proceder a realizar los ejercicios de la mejor manera posible, para que entendaís como es posible hacer auditorías en PostgreSQL, por lo que vamos a dar comienzo.
+
+#### 1. Auditoria de accesos
+
+##### Entrada exitosa
+
+En esta ocasión lo que voy a hacer es probar haber si tengo exito en este SGBD, con la entrada de nuestro usuario **SCOTT**
+
+En esta ocasión no se que usuarios tengo, por lo que primero que haré será ver que usuarios activos tengo en la bases de datos, por lo que haremos del siguiente comando:
+
+```sql
+postgres=# SELECT DISTINCT usename FROM pg_stat_activity;
+ usename  
+----------
+ 
+ postgres
+(2 filas)
+
+```
+
+Como podemos observar tenemos solo el usuario postgres, por lo que voy a meter al usuario `SCOTT` en esta base de datos, por lo que dejo por aqui su [creación](./scott.sql)
+
+Una vez creado este usuario con sus tablas, lo que vamos a proceder es a abrir una terminal y entrar con él, y probar si ha tenido exito su entrada:
+
+```sql
+andy@postgreSQL:~$ sudo -u postgres psql
+psql (15.9 (Debian 15.9-0+deb12u1))
+Digite «help» para obtener ayuda.
+
+postgres=# SELECT DISTINCT usename FROM pg_stat_activity;
+ usename  
+----------
+ 
+ postgres
+ scott
+(3 filas)
+
+postgres=# 
+```
+##### Entrada no exitosa o de acceso fallido.
+
+Para realizar esta auditoría de accesos fallidos, vamos a tener que hacer uso de los logs de acceso de PostgreSQL, por lo que habrá que activarlos en el fichero de configuración, que se encuentran en la siguiente ruta:
+
+`/etc/postgresql/15/main/postgresql.conf`
+
+Y vamos a modificar las siguientes líneas, y poner lo siguiente:
+
+```bash
+log_line_prefix = '%m %u %d %r %p %h %a %q '
+
+log_statement = ‘all’
+```
+
+- Donde:
+
+- `%m`: Fecha y hora de la entrada de log.
+- `%u`: Nombre del usuario de la base de datos que realiza la acción.
+- `%d`: Nombre de la base de datos.
+- `%r`: Dirección IP del cliente que se conecta al servidor.
+- `%p`: ID del proceso del servidor de PostgreSQL.
+- `%h`: Dirección del cliente (host).
+- `%a`: Dirección de la aplicación cliente.
+- `%q`: Consulta SQL que se está ejecutando (si aplica).
+- `log_statement = 'all'`
+Esta configuración especifica qué tipos de sentencias SQL deben ser registradas. Con `'all'`, PostgreSQL registrará **todas** las consultas SQL que se ejecutan en la base de datos. Es útil para auditorías o para solucionar problemas, ya que proporciona un registro exhaustivo de todas las operaciones SQL que se realizan.
+
+Una vez que lo hemos modifcado lo que haremos será reiniciar el servicio de PostgreSQL, con el siguiente comando:
+
+```bash 
+sudo service postgresql restart
+```
+Y una vez hecho esto lo que haremos será realizar la auditoría correctamente, por lo que tendré dos terminales abiertas, y en una dejaré los logs abiertos y en el otro fallaré la entrada:
+
+![Fallo de scott](auditoria-fallando-entrada.png)
+
+Tambien dejo por aquí cuando tengo exito en la entrada:
+
+![Exito en la entrada](entrada-exitosa.png)
+
+
+##### 3. Auditoria DML
+
+Para esta auditoría hay que hacer uso de la siguiente extensión `Audit Trigger`. Por lo que habra que crear una tabla en la base de datos `postgres` en la cual tendremos que hacer inserciones, actualizaciones y borrado de datos en la base de datos SCOTT.
+
+Por lo que dejo por aquí lo que haré:
+
+```sql
+--insertar
+
+INSERT INTO public.dept VALUES (50, 'MARKETING', 'LOS ANGELES');
+INSERT INTO public.dept VALUES (60, 'ENGINEERING', 'SEATTLE');
+INSERT INTO public.dept VALUES (70, 'HR', 'SAN FRANCISCO');
+INSERT INTO public.dept VALUES (80, 'FINANCE', 'CHICAGO');
+
+-- Actualizar
+
+UPDATE public.dept 
+SET dname = 'DIGITAL MARK', loc = 'SAN FRANCISCO' 
+WHERE deptno = 50;
+
+UPDATE public.dept 
+SET dname = 'PRODUCT DEV', loc = 'PORTLAND' 
+WHERE deptno = 60;
+
+UPDATE public.dept 
+SET dname = 'TALENT MGMT', loc = 'LOS ANGELES' 
+WHERE deptno = 70;
+
+UPDATE public.dept 
+SET dname = 'CORP FINANCE', loc = 'NEW YORK' 
+WHERE deptno = 80;
+
+
+-- Borrado
+
+DELETE FROM public.dept WHERE deptno IN (50, 60, 70, 80);
+
+```
+
+Una vez hecho esto vamos a proceder a comprobar con Audit Trigger para ver como se ha realizado la auditoria, por lo que vamos a meternos desde nuestro usuario postgres, y hacer lo siguiente:
+
+```sql
+andy@postgreSQL:~$ sudo -u postgres psql
+[sudo] contraseña para andy: 
+psql (15.9 (Debian 15.9-0+deb12u1))
+Digite «help» para obtener ayuda.
+
+postgres=#   select audit.audit_table('DEPT');
+NOTICE:  disparador «audit_trigger_row» para la relación «dept» no existe, omitiendo
+NOTICE:  disparador «audit_trigger_stm» para la relación «dept» no existe, omitiendo
+NOTICE:  CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON dept FOR EACH ROW EXECUTE PROCEDURE audit.if_modified_func('true');
+NOTICE:  CREATE TRIGGER audit_trigger_stm AFTER TRUNCATE ON dept FOR EACH STATEMENT EXECUTE PROCEDURE audit.if_modified_func('true');
+ audit_table 
+-------------
+ 
+(1 fila)
+
+postgres=# 
+
+```
+
+Pero como no se ve absolutamente nada vamos a meter esto por consola:
+
+```sql
+select session_user_name, action, table_name, action_tstamp_clk, client_query from audit.logged_actions;
+```
+
+Y mientras que estamos en otra terminal haciendo las inserciones, update y demás lo que tenemos que hacer es irnos como postgres a la otra terminal y ejecutar el comando anterior, y como vemos por pantalla vemos como se hacen las acciones que estamos haciendo como scott.
+
+![Dml-postgres](dml-postgres.png)
+
+
+Si tuvieramos una base de datos llamada **croissant**, pues tendruiamso que entrar como el uusuario postrges de la siguiente manera:
+
+```sql
+\c base_datos_que_fuera;
+```
+
+
+##### 4. Auditoria grano fino.
+
+Lo primero que haré será crear la tabla de auditoría, esta la creo para almacenar los datos de estas mismas.
+
+```sql
+CREATE TABLE public.emp_audit (
+    audit_id SERIAL PRIMARY KEY,
+    empno INTEGER,
+    ename VARCHAR(10),
+    comm NUMERIC(7,2),
+    inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+Después de esto lo que hago es crear un trigger el cual vaya a capturar las insersiones en la tabla `emp` cuando algún empleado tenga comisión.
+
+```sql
+CREATE OR REPLACE FUNCTION auidoria_comisiones()
+RETURNS TRIGGER AS $$
+BEGIN
+
+    IF NEW.comm IS NOT NULL THEN
+        
+        INSERT INTO public.emp_audit (empno, ename, comm)
+        VALUES (NEW.empno, NEW.ename, NEW.comm);
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+```
+
+Luego creo un trigger para que se ejecute automaticamente cada vez que se inserte un nuevo registro en la tabla **emp** con comisión:
+
+```sql
+CREATE TRIGGER trg_auditoria_insersiones
+AFTER INSERT ON public.emp
+FOR EACH ROW
+EXECUTE FUNCTION auidoria_comisiones();
+
+```
+
+Ahora lo que hago es probarlo, insertando algun empleado:
+
+```sql
+INSERT INTO public.emp (empno, ename, job, mgr, hiredate, sal, comm, deptno)
+VALUES (7777, 'Sportacus', 'adios', 7698, '2025-02-22', 1500, 300, 30);
+
+```
+
+y luego consultamos la tabla de la auditoria de la siguiente forma:
+
+```sql
+SELECT * FROM public.emp_audit;
+```
+
+y esto es lo que nos aparece por pantalla:
+
+```sql
+postgres=# SELECT * FROM public.emp_audit;
+ audit_id | empno |   ename   |  comm  |        inserted_at         
+----------+-------+-----------+--------+----------------------------
+        1 |  9999 | hola      | 300.00 | 2025-02-22 17:56:20.369125
+        2 |  7777 | Sportacus | 300.00 | 2025-02-22 17:59:06.081495
+        3 |  7777 | Sportacus | 300.00 | 2025-02-22 17:59:06.081495
+(3 filas)
+
+```
+---
 **## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 **## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
