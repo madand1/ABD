@@ -992,6 +992,12 @@ Y esto nos muestra por pantall lo siguiente:
 Y como podemos apreciar la columna `SQL_TEXT` se ha rellenado con lo que hicimos, es decir nos ha mostrado las sentencias que se han llevado a cabo.
 
 
+🚨🚨 **Nota informativa**🚨🚨
+
+Estoy metiendo las tablas en este formato porque la salida que da el **SQLPLUS** no se entiende nada. Por lo tanto, me he visto obligado a hacerlo de esta manera para mayor claridad. 😅
+
+
+---
 **## 7. Averigua si en Postgres se pueden realizar los cuatro primeros apartados. Si es así, documenta el proceso adecuadamente.**
 **## 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 **## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
