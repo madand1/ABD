@@ -1508,7 +1508,911 @@ MariaDB [scott]> select * from scott.emp_auditoria;
 2 rows in set (0,000 sec)
 ```
 ---
-**## 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
+## **9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
+
+Para esta ocasión en este SGBD noSQL, como bien dice el enunciado, vamos  a ver que opciones de auditoria que nos ofrece MongoDB, pero para que vaya a buen puesto esta práctica tendremos que tener instalado la edición **Enterprise**,ya que la version **Community** no incluye lo que son herramientas integradas para auditorias.
+
+Como ya teniamos montado una versión que no era la adecuada (**Community**), lo que he hecho es seguir la instalación de la versión que no has hecho falta en su [página oficial](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-enterprise-on-debian/#install-mongodb-enterprise-edition), y seguir lo pasos para obtener la que nos hace falta, os voy a mosstar  como podeis ver la versión que teneis, y es con el siguiente comando:
+
+```bash 
+mongod --version
+```
+
+Y nos muestra por pantalla lo siguiente:
+
+![Versión MongoDB](6.png)
+
+Ahora viendo en la documentación oficial las auditorias, MongoDB nos ofrece tres opciones para poder activarlas, las cuales son:
+
+- Registro en syslog → Guarda los eventos de auditoría en el sistema de logs del servidor.
+- Archivos JSON o BSON → Permite almacenar los registros de auditoría en archivos, lo que facilita su análisis posterior.
+- Auditoría en tiempo real (consola) → Muestra los eventos de auditoría directamente en la consola, útil para monitoreo en vivo.
+
+Cada una de estas opciones tiene su propio caso de uso, dependiendo de si se necesita persistencia a largo plazo o monitoreo inmediato.
+
+A continuación voy a mostrar como habilitarlas a través del fichero de configuración de MongoDB, este fichero se encunetra en la siguiente ruta `/etc/mongod.conf`.
+
+- Syslog
+- JSON/BSON
+- Tiempo real
+
+Como hemos comentado antes tenemos que hacerlo haciendo la edición del siguiente fichero `/etc/mongod.conf`, una vez entrado en este fichero, podremos realizar las siguientes acciones, dependiendo de lo que queramos realizar, por lo que os voy a mostrar cada una de ellas como hacerlo, por lo que voy a desglosarlo por partes.
+
+- **Syslog**
+Para habiliatr esta auditoria y qu enos imprima los datos de dicha auditoria por **Syslog** es un **formato JSON**, tendremos que cambiar de lo que tenemos iniciarlmente:
+
+```bash
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongodb
+
+```
+
+A esto:
+
+```bash
+# Where and how to store data.
+storage:
+    dbPath: /var/lib/mongodb
+auditLog:
+    destination: syslog
+```
+Luego de editar el fichero tendriamos que hacer lo siguiente, tambien podríamos especificarlo por consola, con el siguiente comando:
+
+```bash
+  mongod --dbpath /var/lib/mongodb --auditDestination syslog
+```
+
+- **Salida por consola**
+
+Para esta auditoria y que nos imprima la salida por la consola, tendremos que cambiar las opciones en el fichero de configuración, es decir, pasar de esta primera forma:
+
+```bash
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongodb
+```
+
+a esta:
+
+```bash
+# Where and how to store data.
+storage:
+    dbPath: /var/lib/mongodb
+auditLog:
+    destination: console
+```
+
+Luego de editar el fichero tendriamos que hacer lo siguiente, especificandolo por comandos en la consola, por lo que quedaria de la siguiente forma:
+
+```bash
+ mongod --dbpath /var/lib/mongodb --auditDestination console
+```
+- **Salida de una archivo JSON**
+
+Para esta opción y la última, tendriamos que como anteriormente editar el fichero mencionando anteriormente, y pasar de esto:
+
+```bash
+# Where and how to store data.
+storage:
+  dbPath: /var/lib/mongodb
+```
+
+a esto:
+
+```bash
+storage:
+    dbPath: /var/lib/mongodb
+auditLog:
+    destination: file
+    format: JSON
+    path: /var/lib/mongodb/auditLog.json
+```
+
+Como mencione anteiromente también esta la salida en el fichero **BSON**, por lo que si quisieramos que fuera ese el formato, tendria la siguiente apariencia:
+
+```bash
+storage:
+    dbPath: /var/lib/mongodb
+auditLog:
+    destination: file
+    format: BSON
+    path: /var/lib/mongodb/auditLog.bson
+```
+
+Y como anteriormente lo podemos hacer por consola y seria con el siguiente comando:
+
+```bash
+mongod --dbpath /var/lib/mongodb/ --auditDestination file --auditFormat JSON --auditPath /var/lib/mongodb/auditLog.json
+```
+
+Y ya que esta es la última opción que acabamos de ver, y por ende es la que más reciente tenemos, lo voy a realizar así por comodidad para nosotros y no tener que retroceder, por lo que vamos a ejecutar el comando:
+
+![Configuración json](mongo-json.png)
+
+
+
+Lo que nos muestra por pantalla, una vez conmfigurado todo, de haber hecho lo siguientes pasos:
+
+```bash
+andy@debian:~$ sudo touch /var/lib/mongodb/auditLog.json
+andy@debian:~$ sudo chmod 660 /var/lib/mongodb/auditLog.json
+andy@debian:~$ sudo chown mongodb:mongodb /var/lib/mongodb/auditLog.json
+andy@debian:~$ sudo systemctl restart mongod
+andy@debian:~$ sudo systemctl status mongod
+● mongod.service - MongoDB Database Server
+     Loaded: loaded (/lib/systemd/system/mongod.service; enabled; preset: enabled)
+     Active: active (running) since Sun 2025-02-23 11:48:22 CET; 5s ago
+       Docs: https://docs.mongodb.org/manual
+   Main PID: 1706 (mongod)
+     Memory: 199.8M
+        CPU: 327ms
+     CGroup: /system.slice/mongod.service
+             └─1706 /usr/bin/mongod --config /etc/mongod.conf
+
+feb 23 11:48:22 debian systemd[1]: Started mongod.service - MongoDB Database Server.
+feb 23 11:48:22 debian mongod[1706]: {"t":{"$date":"2025-02-23T10:48:22.993Z"},"s":"I",  "c":"CONTROL",  "id":7484500, "ctx":"main","msg":"Environment variable MONGODB_CONFIG_OVERRIDE_NOFORK == 1, overriding \"processManage>
+lines 1-12/12 (END)
+```
+y como hemos verificado que esta corriendo y esta todo habilitado, para poder ver lo que es el fichero `audit.json`, vamos a necesitar lo siguiiente que es el programa jq, el cual nos va a permitir leer los ficheros JSON, por lo que vamos a instalarlo:
+
+```bash
+andy@debian:~$ sudo apt install jq
+```
+y luego para cerciorarnos de que esto esta corriendo perfectamente vamos a comporbar lo logs que se han puesto hecho en dicho fichero, por lo que tendremos que meter el siguiente ocmando:
+
+```bash 
+andy@debian:~$ sudo cat /var/lib/mongodb/auditLog.json | jq
+```
+y si vemos lo que nos aparece por pantalla es lo siguiente:
+
+```bash
+andy@debian:~$ sudo cat /var/lib/mongodb/auditLog.json | jq
+{
+  "atype": "rotateLog",
+  "ts": {
+    "$date": "2025-02-23T11:48:22.999+01:00"
+  },
+  "param": {
+    "pid": 1706,
+    "osInfo": {
+      "name": "PRETTY_NAME=\"Debian GNU/Linux 12 (bookworm)\"",
+      "version": "Kernel 6.1.0-28-amd64"
+    },
+    "logRotationStatus": {
+      "status": "OK",
+      "rotatedLogPath": "/var/lib/mongodb/auditLog.json.2025-02-23T10-48-22",
+      "errors": []
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "startup",
+  "ts": {
+    "$date": "2025-02-23T11:48:23.291+01:00"
+  },
+  "uuid": {
+    "$binary": "VvlUHMeeRjyV+Ekt5F72rQ==",
+    "$type": "04"
+  },
+  "local": {
+    "isSystemUser": true
+  },
+  "remote": {
+    "isSystemUser": true
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "startupOptions": {
+      "auditLog": {
+        "destination": "file",
+        "format": "JSON",
+        "path": "/var/lib/mongodb/auditLog.json"
+      },
+      "config": "/etc/mongod.conf",
+      "net": {
+        "bindIp": "127.0.0.1",
+        "port": 27017
+      },
+      "processManagement": {
+        "timeZoneInfo": "/usr/share/zoneinfo"
+      },
+      "security": {
+        "authorization": "enabled"
+      },
+      "storage": {
+        "dbPath": "/var/lib/mongodb"
+      },
+      "systemLog": {
+        "destination": "file",
+        "logAppend": true,
+        "path": "/var/log/mongodb/mongod.log"
+      }
+    },
+    "initialClusterServerParameters": [
+      {
+        "_id": "addOrRemoveShardInProgress",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "inProgress": false
+      },
+      {
+        "_id": "auditConfig",
+        "auditConfig": {
+          "filter": {},
+          "auditAuthorizationSuccess": false,
+          "clusterParameterTime": {
+            "$timestamp": {
+              "t": 0,
+              "i": 0
+            }
+          }
+        }
+      },
+      {
+        "_id": "changeStreamOptions",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "preAndPostImages": {
+          "expireAfterSeconds": "off"
+        }
+      },
+      {
+        "_id": "changeStreams",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "expireAfterSeconds": {
+          "$numberLong": "3600"
+        }
+      },
+      {
+        "_id": "configServerReadPreferenceForCatalogQueries",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "mustAlwaysUseNearest": false
+      },
+      {
+        "_id": "defaultMaxTimeMS",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "readOperations": {
+          "$numberLong": "0"
+        }
+      },
+      {
+        "_id": "fleCompactionOptions",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "maxCompactionSize": 268435456,
+        "maxAnchorCompactionSize": 268435456,
+        "maxESCEntriesPerCompactionDelete": 350000
+      },
+      {
+        "_id": "internalQueryCutoffForSampleFromRandomCursor",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "sampleCutoff": 0.05
+      },
+      {
+        "_id": "pauseMigrationsDuringMultiUpdates",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "enabled": false
+      },
+      {
+        "_id": "querySettings",
+        "settingsArray": [],
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        }
+      },
+      {
+        "_id": "shardedClusterCardinalityForDirectConns",
+        "clusterParameterTime": {
+          "$timestamp": {
+            "t": 0,
+            "i": 0
+          }
+        },
+        "hasTwoOrMoreShards": false
+      }
+    ]
+  },
+  "result": 0
+}
+{
+  "atype": "getClusterParameter",
+  "ts": {
+    "$date": "2025-02-23T11:48:24.008+01:00"
+  },
+  "uuid": {
+    "$binary": "zLWKAVh0R2m1MDZ2QjCZ9w==",
+    "$type": "04"
+  },
+  "local": {
+    "isSystemUser": true
+  },
+  "remote": {
+    "isSystemUser": true
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "requestedClusterServerParameters": "*"
+  },
+  "result": 0
+}
+{
+  "atype": "getClusterParameter",
+  "ts": {
+    "$date": "2025-02-23T11:53:24.004+01:00"
+  },
+  "uuid": {
+    "$binary": "zLWKAVh0R2m1MDZ2QjCZ9w==",
+    "$type": "04"
+  },
+  "local": {
+    "isSystemUser": true
+  },
+  "remote": {
+    "isSystemUser": true
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "requestedClusterServerParameters": "*"
+  },
+  "result": 0
+}
+{
+  "atype": "getClusterParameter",
+  "ts": {
+    "$date": "2025-02-23T11:58:24.003+01:00"
+  },
+  "uuid": {
+    "$binary": "zLWKAVh0R2m1MDZ2QjCZ9w==",
+    "$type": "04"
+  },
+  "local": {
+    "isSystemUser": true
+  },
+  "remote": {
+    "isSystemUser": true
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "requestedClusterServerParameters": "*"
+  },
+  "result": 0
+}
+{
+  "atype": "clientMetadata",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.053+01:00"
+  },
+  "uuid": {
+    "$binary": "WltSU3caSIaaVFATk9W98g==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57946
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "localEndpoint": {
+      "ip": "127.0.0.1",
+      "port": 27017
+    },
+    "clientMetadata": {
+      "application": {
+        "name": "mongosh 2.4.0"
+      },
+      "driver": {
+        "name": "nodejs|mongosh",
+        "version": "6.13.0|2.4.0"
+      },
+      "platform": "Node.js v20.18.3, LE",
+      "os": {
+        "name": "linux",
+        "architecture": "x64",
+        "version": "3.10.0-327.22.2.el7.x86_64",
+        "type": "Linux"
+      }
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "clientMetadata",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.057+01:00"
+  },
+  "uuid": {
+    "$binary": "e/5L1xPoS3a8wf9O3BQ0vg==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57952
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "localEndpoint": {
+      "ip": "127.0.0.1",
+      "port": 27017
+    },
+    "clientMetadata": {
+      "application": {
+        "name": "mongosh 2.4.0"
+      },
+      "driver": {
+        "name": "nodejs|mongosh",
+        "version": "6.13.0|2.4.0"
+      },
+      "platform": "Node.js v20.18.3, LE",
+      "os": {
+        "name": "linux",
+        "architecture": "x64",
+        "version": "3.10.0-327.22.2.el7.x86_64",
+        "type": "Linux"
+      }
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "authenticate",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.064+01:00"
+  },
+  "uuid": {
+    "$binary": "e/5L1xPoS3a8wf9O3BQ0vg==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57952
+  },
+  "users": [
+    {
+      "user": "andy",
+      "db": "admin"
+    }
+  ],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "user": "andy",
+    "db": "admin",
+    "mechanism": "SCRAM-SHA-256"
+  },
+  "result": 0
+}
+{
+  "atype": "clientMetadata",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.074+01:00"
+  },
+  "uuid": {
+    "$binary": "RVRH+7xPSKqbooMs94XG2g==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57956
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "localEndpoint": {
+      "ip": "127.0.0.1",
+      "port": 27017
+    },
+    "clientMetadata": {
+      "application": {
+        "name": "mongosh 2.4.0"
+      },
+      "driver": {
+        "name": "nodejs|mongosh",
+        "version": "6.13.0|2.4.0"
+      },
+      "platform": "Node.js v20.18.3, LE",
+      "os": {
+        "name": "linux",
+        "architecture": "x64",
+        "version": "3.10.0-327.22.2.el7.x86_64",
+        "type": "Linux"
+      }
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "clientMetadata",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.074+01:00"
+  },
+  "uuid": {
+    "$binary": "/xFxtNBDTOysPQbgHqkBXA==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57966
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "localEndpoint": {
+      "ip": "127.0.0.1",
+      "port": 27017
+    },
+    "clientMetadata": {
+      "application": {
+        "name": "mongosh 2.4.0"
+      },
+      "driver": {
+        "name": "nodejs|mongosh",
+        "version": "6.13.0|2.4.0"
+      },
+      "platform": "Node.js v20.18.3, LE",
+      "os": {
+        "name": "linux",
+        "architecture": "x64",
+        "version": "3.10.0-327.22.2.el7.x86_64",
+        "type": "Linux"
+      }
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "authenticate",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.075+01:00"
+  },
+  "uuid": {
+    "$binary": "RVRH+7xPSKqbooMs94XG2g==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57956
+  },
+  "users": [
+    {
+      "user": "andy",
+      "db": "admin"
+    }
+  ],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "user": "andy",
+    "db": "admin",
+    "mechanism": "SCRAM-SHA-256"
+  },
+  "result": 0
+}
+{
+  "atype": "authenticate",
+  "ts": {
+    "$date": "2025-02-23T11:58:54.075+01:00"
+  },
+  "uuid": {
+    "$binary": "/xFxtNBDTOysPQbgHqkBXA==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57966
+  },
+  "users": [
+    {
+      "user": "andy",
+      "db": "admin"
+    }
+  ],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "user": "andy",
+    "db": "admin",
+    "mechanism": "SCRAM-SHA-256"
+  },
+  "result": 0
+}
+{
+  "atype": "clientMetadata",
+  "ts": {
+    "$date": "2025-02-23T11:59:04.564+01:00"
+  },
+  "uuid": {
+    "$binary": "Kl2IgEvlSomrO2A37y50XQ==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 41182
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "localEndpoint": {
+      "ip": "127.0.0.1",
+      "port": 27017
+    },
+    "clientMetadata": {
+      "application": {
+        "name": "mongosh 2.4.0"
+      },
+      "driver": {
+        "name": "nodejs|mongosh",
+        "version": "6.13.0|2.4.0"
+      },
+      "platform": "Node.js v20.18.3, LE",
+      "os": {
+        "name": "linux",
+        "architecture": "x64",
+        "version": "3.10.0-327.22.2.el7.x86_64",
+        "type": "Linux"
+      }
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "logout",
+  "ts": {
+    "$date": "2025-02-23T11:59:37.742+01:00"
+  },
+  "uuid": {
+    "$binary": "RVRH+7xPSKqbooMs94XG2g==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57956
+  },
+  "users": [],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "reason": "Client has disconnected",
+    "initialUsers": [
+      {
+        "user": "andy",
+        "db": "admin"
+      }
+    ],
+    "updatedUsers": [],
+    "loginTime": {
+      "$date": "2025-02-23T11:58:54.075+01:00"
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "logout",
+  "ts": {
+    "$date": "2025-02-23T11:59:37.742+01:00"
+  },
+  "uuid": {
+    "$binary": "e/5L1xPoS3a8wf9O3BQ0vg==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57952
+  },
+  "users": [],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "reason": "Client has disconnected",
+    "initialUsers": [
+      {
+        "user": "andy",
+        "db": "admin"
+      }
+    ],
+    "updatedUsers": [],
+    "loginTime": {
+      "$date": "2025-02-23T11:58:54.064+01:00"
+    }
+  },
+  "result": 0
+}
+{
+  "atype": "logout",
+  "ts": {
+    "$date": "2025-02-23T11:59:37.742+01:00"
+  },
+  "uuid": {
+    "$binary": "/xFxtNBDTOysPQbgHqkBXA==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57966
+  },
+  "users": [],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "reason": "Client has disconnected",
+    "initialUsers": [
+      {
+        "user": "andy",
+        "db": "admin"
+      }
+    ],
+    "updatedUsers": [],
+    "loginTime": {
+      "$date": "2025-02-23T11:58:54.075+01:00"
+    }
+  },
+  "result": 0
+}
+
+```
+
+Si no fijamos en este caso podemos ver como me he logeado con mi usuario andy, el cual tienen el role de root y en la base de datos admin, dejo el trozo de cópdigo en el cual se ve, y tambien cuando nos logeamos y cuando nos desconectamos:
+
+```bash
+{
+  "atype": "logout",
+  "ts": {
+    "$date": "2025-02-23T11:59:37.742+01:00"
+  },
+  "uuid": {
+    "$binary": "/xFxtNBDTOysPQbgHqkBXA==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 57966
+  },
+  "users": [],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
+  "param": {
+    "reason": "Client has disconnected",
+    "initialUsers": [
+      {
+        "user": "andy",
+        "db": "admin"
+      }
+    ],
+    "updatedUsers": [],
+    "loginTime": {
+      "$date": "2025-02-23T11:58:54.075+01:00"
+    }
+  },
+  "result": 0
+}
+```
+
+Ahora probare todo esto con algún ejemplo más práctico, para ver mejro lo que on la actividad de los logs en dicha auditoría, por lo que vamos a dar comienzo a dicha tarea:
+
+
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
 **## 11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
 
