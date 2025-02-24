@@ -2412,6 +2412,52 @@ Si no fijamos en este caso podemos ver como me he logeado con mi usuario andy, e
 
 Ahora probare todo esto con algún ejemplo más práctico, para ver mejro lo que on la actividad de los logs en dicha auditoría, por lo que vamos a dar comienzo a dicha tarea:
 
+Lo primero que voy a hacer es crear una base de datos, junto con una colección, dnetro de ella voyt a hacer una auditoria a algún tipo, o precio mayor, obviamente voy a hacer algo relacionado con el mundo del motor, por lo que vamos a ello:
+
+```sql
+use practicamotos;
+
+-- Creación de la colección
+
+db.createCollection("Motos");
+
+-- Insertar un ejemplo de documento
+db.Motos.insertOne({ nombre: "Yamaha R1", tipo: "Deportiva", pvp: 20000 });
+
+db.Motos.insertOne({ nombre: "Honda CB500X", tipo: "Aventura", pvp: 7500 });
+
+db.Motos.insertOne({ nombre: "Vespa Primavera", tipo: "Scooter", pvp: 4500 });
+
+```
+Como podemos ver por pantalla, tenemos nos da lo siguiente:
+
+![Creación de bases, colección y contenidp](colección-motos.png)
+
+Ahora voy a hacer algunos movimientos, vamos a cambiar el tipo de alguno de estos ejemplos, y tambien borrar.
+
+Lo primero que vamos a hacer es borrar el tipo Scooter, porque eso no es una moto, es un triciclo, y tambien vamos a editar lo que es el tipo deportivo, a super deportivo:
+
+```sql
+-- Cambio de tipo de deportivo a superdeportivo
+db.Motos.updateOne(
+    { tipo: "Deportiva" }, 
+    { $set: { tipo: "Superdeportiva" } }
+);
+
+-- Borrar la scooter, que es un triciclo
+
+db.Motos.deleteOne({ tipo: "Scooter" });
+```
+Lo podemos ver por pantalla:
+
+![Edición motos](edicion-motos.png)
+
+Lo comprobamos in situ:
+
+![De los cambios](comprobacion7.png)
+
+Y ahora lo vamos a ver a través de los logs, por lo que vamos a meter lo siguiente:
+
 
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
 **## 11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
