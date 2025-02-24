@@ -2456,7 +2456,740 @@ Lo comprobamos in situ:
 
 ![De los cambios](comprobacion7.png)
 
-Y ahora lo vamos a ver a través de los logs, por lo que vamos a meter lo siguiente:
+Y ahora lo vamos a ver a través de los logs, por lo que vamos a meter lo siguiente, voy a hacer una aclaración, para ver lo que se ha insertado, actualizazo y demas:
+
+```sql
+-- Ver los insert
+
+Enterprise practicamotos> db.system.profile.find({ op: "insert" }).pretty()
+... 
+[
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Yamaha R1',
+          tipo: 'Deportiva',
+          pvp: 20000,
+          _id: ObjectId('67bc533a31aae5b2c151e944')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 214051,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:42.450Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Honda CB500X',
+          tipo: 'Aventura',
+          pvp: 7500,
+          _id: ObjectId('67bc533f31aae5b2c151e945')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 148019,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:47.628Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Vespa Primavera',
+          tipo: 'Scooter',
+          pvp: 4500,
+          _id: ObjectId('67bc534331aae5b2c151e946')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 124090,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:51.943Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  }
+]
+
+-- Ver los update
+
+Enterprise practicamotos> db.system.profile.find({ op: "update" }).pretty()
+... 
+[
+  {
+    op: 'update',
+    ns: 'practicamotos.Motos',
+    command: {
+      q: { tipo: 'Deportiva' },
+      u: { '$set': { tipo: 'Superdeportiva' } },
+      multi: false,
+      upsert: false
+    },
+    keysExamined: 0,
+    docsExamined: 1,
+    nMatched: 1,
+    nModified: 1,
+    nUpserted: 0,
+    keysInserted: 0,
+    keysDeleted: 0,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { r: Long('1'), w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    storage: {},
+    cpuNanos: 386731,
+    millis: 1,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 240,
+    execStats: {
+      isCached: false,
+      stage: 'UPDATE',
+      nReturned: 0,
+      executionTimeMillisEstimate: 0,
+      works: 1,
+      advanced: 0,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      nMatched: 1,
+      nWouldModify: 1,
+      nWouldUpsert: 0,
+      inputStage: {
+        stage: 'COLLSCAN',
+        filter: { tipo: { '$eq': 'Deportiva' } },
+        nReturned: 1,
+        executionTimeMillisEstimate: 0,
+        works: 1,
+        advanced: 1,
+        needTime: 0,
+        needYield: 0,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 0,
+        direction: 'forward',
+        docsExamined: 1
+      }
+    },
+    ts: ISODate('2025-02-24T11:08:59.693Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  }
+]
+
+-- Ver lo borrado
+
+Enterprise practicamotos> db.system.profile.find({ op: "remove" }).pretty()
+... 
+[
+  {
+    op: 'remove',
+    ns: 'practicamotos.Motos',
+    command: { q: { tipo: 'Scooter' }, limit: 1 },
+    keysExamined: 0,
+    docsExamined: 3,
+    ndeleted: 1,
+    keysDeleted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { r: Long('1'), w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    storage: {},
+    cpuNanos: 449291,
+    millis: 0,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 106,
+    execStats: {
+      isCached: false,
+      stage: 'DELETE',
+      nReturned: 0,
+      executionTimeMillisEstimate: 0,
+      works: 3,
+      advanced: 0,
+      needTime: 2,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      nWouldDelete: 1,
+      inputStage: {
+        stage: 'COLLSCAN',
+        filter: { tipo: { '$eq': 'Scooter' } },
+        nReturned: 1,
+        executionTimeMillisEstimate: 0,
+        works: 3,
+        advanced: 1,
+        needTime: 2,
+        needYield: 0,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 0,
+        direction: 'forward',
+        docsExamined: 3
+      }
+    },
+    ts: ISODate('2025-02-24T11:09:05.362Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  }
+]
+
+-- Ordenar por operaciones recientes
+
+Enterprise practicamotos> db.system.profile.find().sort({ ts: -1 }).limit(10).pretty()
+... 
+[
+  {
+    op: 'query',
+    ns: 'practicamotos.system.profile',
+    command: {
+      find: 'system.profile',
+      filter: { op: 'remove' },
+      lsid: { id: UUID('64702a68-4141-40e0-accf-85130528e615') },
+      '$db': 'practicamotos'
+    },
+    keysExamined: 0,
+    docsExamined: 8,
+    nBatches: 1,
+    cursorExhausted: true,
+    numYield: 0,
+    nreturned: 1,
+    planCacheShapeHash: 'D690B1A0',
+    queryHash: 'D690B1A0',
+    planCacheKey: '64644580',
+    queryFramework: 'classic',
+    locks: { Global: { acquireCount: { r: Long('1') } } },
+    flowControl: {},
+    responseLength: 1259,
+    protocol: 'op_msg',
+    cpuNanos: 159414,
+    millis: 0,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 95,
+    execStats: {
+      isCached: false,
+      stage: 'COLLSCAN',
+      filter: { op: { '$eq': 'remove' } },
+      nReturned: 1,
+      executionTimeMillisEstimate: 0,
+      works: 9,
+      advanced: 1,
+      needTime: 7,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 8
+    },
+    ts: ISODate('2025-02-24T11:16:29.212Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'query',
+    ns: 'practicamotos.system.profile',
+    command: {
+      find: 'system.profile',
+      filter: { op: 'update' },
+      lsid: { id: UUID('64702a68-4141-40e0-accf-85130528e615') },
+      '$db': 'practicamotos'
+    },
+    keysExamined: 0,
+    docsExamined: 7,
+    nBatches: 1,
+    cursorExhausted: true,
+    numYield: 0,
+    nreturned: 1,
+    planCacheShapeHash: 'D690B1A0',
+    queryHash: 'D690B1A0',
+    planCacheKey: '64644580',
+    queryFramework: 'classic',
+    locks: { Global: { acquireCount: { r: Long('1') } } },
+    flowControl: {},
+    responseLength: 1393,
+    protocol: 'op_msg',
+    cpuNanos: 157143,
+    millis: 0,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 94,
+    execStats: {
+      isCached: false,
+      stage: 'COLLSCAN',
+      filter: { op: { '$eq': 'update' } },
+      nReturned: 1,
+      executionTimeMillisEstimate: 0,
+      works: 8,
+      advanced: 1,
+      needTime: 6,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 7
+    },
+    ts: ISODate('2025-02-24T11:16:05.936Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'query',
+    ns: 'practicamotos.system.profile',
+    command: {
+      find: 'system.profile',
+      filter: { op: 'insert' },
+      lsid: { id: UUID('64702a68-4141-40e0-accf-85130528e615') },
+      '$db': 'practicamotos'
+    },
+    keysExamined: 0,
+    docsExamined: 6,
+    nBatches: 1,
+    cursorExhausted: true,
+    numYield: 0,
+    nreturned: 3,
+    planCacheShapeHash: 'D690B1A0',
+    queryHash: 'D690B1A0',
+    planCacheKey: '64644580',
+    queryFramework: 'classic',
+    locks: { Global: { acquireCount: { r: Long('1') } } },
+    flowControl: {},
+    responseLength: 2349,
+    protocol: 'op_msg',
+    cpuNanos: 204697,
+    millis: 0,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 113,
+    execStats: {
+      isCached: false,
+      stage: 'COLLSCAN',
+      filter: { op: { '$eq': 'insert' } },
+      nReturned: 3,
+      executionTimeMillisEstimate: 0,
+      works: 7,
+      advanced: 3,
+      needTime: 3,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 6
+    },
+    ts: ISODate('2025-02-24T11:12:12.649Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'remove',
+    ns: 'practicamotos.Motos',
+    command: { q: { tipo: 'Scooter' }, limit: 1 },
+    keysExamined: 0,
+    docsExamined: 3,
+    ndeleted: 1,
+    keysDeleted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { r: Long('1'), w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    storage: {},
+    cpuNanos: 449291,
+    millis: 0,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 106,
+    execStats: {
+      isCached: false,
+      stage: 'DELETE',
+      nReturned: 0,
+      executionTimeMillisEstimate: 0,
+      works: 3,
+      advanced: 0,
+      needTime: 2,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      nWouldDelete: 1,
+      inputStage: {
+        stage: 'COLLSCAN',
+        filter: { tipo: { '$eq': 'Scooter' } },
+        nReturned: 1,
+        executionTimeMillisEstimate: 0,
+        works: 3,
+        advanced: 1,
+        needTime: 2,
+        needYield: 0,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 0,
+        direction: 'forward',
+        docsExamined: 3
+      }
+    },
+    ts: ISODate('2025-02-24T11:09:05.362Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'update',
+    ns: 'practicamotos.Motos',
+    command: {
+      q: { tipo: 'Deportiva' },
+      u: { '$set': { tipo: 'Superdeportiva' } },
+      multi: false,
+      upsert: false
+    },
+    keysExamined: 0,
+    docsExamined: 1,
+    nMatched: 1,
+    nModified: 1,
+    nUpserted: 0,
+    keysInserted: 0,
+    keysDeleted: 0,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { r: Long('1'), w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    storage: {},
+    cpuNanos: 386731,
+    millis: 1,
+    planSummary: 'COLLSCAN',
+    planningTimeMicros: 240,
+    execStats: {
+      isCached: false,
+      stage: 'UPDATE',
+      nReturned: 0,
+      executionTimeMillisEstimate: 0,
+      works: 1,
+      advanced: 0,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      nMatched: 1,
+      nWouldModify: 1,
+      nWouldUpsert: 0,
+      inputStage: {
+        stage: 'COLLSCAN',
+        filter: { tipo: { '$eq': 'Deportiva' } },
+        nReturned: 1,
+        executionTimeMillisEstimate: 0,
+        works: 1,
+        advanced: 1,
+        needTime: 0,
+        needYield: 0,
+        saveState: 1,
+        restoreState: 1,
+        isEOF: 0,
+        direction: 'forward',
+        docsExamined: 1
+      }
+    },
+    ts: ISODate('2025-02-24T11:08:59.693Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Vespa Primavera',
+          tipo: 'Scooter',
+          pvp: 4500,
+          _id: ObjectId('67bc534331aae5b2c151e946')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 124090,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:51.943Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Honda CB500X',
+          tipo: 'Aventura',
+          pvp: 7500,
+          _id: ObjectId('67bc533f31aae5b2c151e945')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 148019,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:47.628Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Yamaha R1',
+          tipo: 'Deportiva',
+          pvp: 20000,
+          _id: ObjectId('67bc533a31aae5b2c151e944')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 214051,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:42.450Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  },
+  {
+    op: 'command',
+    ns: 'practicamotos.Motos',
+    command: {
+      create: 'Motos',
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } },
+      Mutex: { acquireCount: { r: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 38,
+    protocol: 'op_msg',
+    cpuNanos: 2518795,
+    millis: 41,
+    ts: ISODate('2025-02-24T11:08:38.390Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  }
+]
+
+```
+En conclusión para los evento de autentificación y autorización, hay que mirar el archivo `/var/log/mongod/auditLog.json`. Y para operaciones, hayq ue hacer una consulta a la coleccion `system.profile` dentro de **MongoDB**.
+
+Tambien si quisieramos hacer una consula por insert a un campo en concreto tendriamos que poner lo siguiente:
+
+```sql
+
+db.system.profile.find({
+  op: "insert",
+  "command.documents.tipo": "Scooter"
+}).pretty()
+
+```
+
+Y nos saldría lo siguiente:
+
+```sql
+]
+Enterprise practicamotos> db.system.profile.find({
+...   op: "insert",
+...   "command.documents.tipo": "Scooter"
+... }).pretty()
+... 
+[
+  {
+    op: 'insert',
+    ns: 'practicamotos.Motos',
+    command: {
+      insert: 'Motos',
+      documents: [
+        {
+          nombre: 'Vespa Primavera',
+          tipo: 'Scooter',
+          pvp: 4500,
+          _id: ObjectId('67bc534331aae5b2c151e946')
+        }
+      ],
+      ordered: true,
+      lsid: { id: UUID('5807a7a4-92e9-4be4-b7aa-7ff92581c3b9') },
+      '$db': 'practicamotos'
+    },
+    ninserted: 1,
+    keysInserted: 1,
+    numYield: 0,
+    locks: {
+      ReplicationStateTransition: { acquireCount: { w: Long('1') } },
+      Global: { acquireCount: { w: Long('1') } },
+      Database: { acquireCount: { w: Long('1') } },
+      Collection: { acquireCount: { w: Long('1') } }
+    },
+    flowControl: { acquireCount: Long('1') },
+    responseLength: 45,
+    protocol: 'op_msg',
+    cpuNanos: 124090,
+    millis: 0,
+    ts: ISODate('2025-02-24T11:08:51.943Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+  }
+]
+```
 
 
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
