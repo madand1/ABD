@@ -3263,11 +3263,129 @@ Con esto lo que vamos a conseguir es hacer una auditoría concreta en la colecci
 ```
 Por lo que si que se puede hace a colecciones especifivas.
 
-**## 11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
+---
+
+# Cassandra
+---
+
+## **11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
+
+En **Cassandra** si que se pueden hacer auditorias sobre las inserciones de datos, el resgistro de dicha auditoria registra cada sollicituda de comando CQL entrante, así como la autentificación en un nodo de Cassandra. Este SGBDnoRelacional, offrece dos implementaciones.
+
+El resgitrador personlizado que se puede implementar e inyectar con el nombre de la clase como un parametro en el fichero `cassandra.yaml`.
+
+- `BinAuditLogger`:una forma eficiente de registrar eventos en un archivo en formato binario
+
+- `FileAuditLogge`r:Registra eventos en audit/audit.logun archivo usando el registrador slf4j
 
 
+Esto lo que hace es capturar:
+
+- Intentos de inicio de sesión exitosos y fallidos.
+- Todos los comando de base de datos que se ejecuten a través del protocolo CQL nativo ya se hayan intenado o ejecutado correctamente.
+
+Los valores reales vinculados a la ejecución de sentencias preparadas no aparecerán en el registro de auditoría.
+
+Los registros de la auditoría:
+
+Cada implementacion de registro de auditoría tiene acceso a los siguientes atributos.
+
+- `user`: Nombre de usuario (si está disponible)
+
+- `host`:IP del host, donde se ejecuta el comando
+
+- `source ip address`: Dirección IP de origen desde donde se inició la solicitud
+
+- `source port`: Número de puerto de origen desde donde se inició la solicitud
+
+- `timestamp`:sello de tiempo de Unix
+
+- `type`:Tipo de solicitud (SELECT, INSERT, etc.,)
+
+- `category`- Categoría de la solicitud (DDL, DML, etc.,)
+
+- `keyspace`- Espacio de claves (si corresponde) en el que se pretende ejecutar la solicitud
+
+- `scope`- Nombre de tabla/agregado/nombre de función/nombre de disparador, etc., según corresponda
+
+- `operation`- Comando CQL en ejecución
+
+Por lo que voy a configurar dicho fichero para lo que nos pide:
+
+Lo primero que haremos sera crear un keyspace nuevo, por lo que en la terminal haremos lo siguiente:
+
+```sql
+cqlsh> CREATE KEYSPACE practica_auditoria
+   ... WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+cqlsh> 
+```
+Una vez creado el keyspace, nos iremos al fichero en cuestión, y buscaremos donde ponga `audit_loggigng_options`, y pondremos lo siguiente:
+
+```sql
+audit_logging_options:
+  enabled: true
+  logger:
+    - class_name: BinAuditLogger
+  included_keyspaces: ["practica_auditoria"]
+  included_categories: [DML]
+```
+Luego de eso reinicimaos cassanadra:
+
+```sql
+nodetool disableauditlog
+nodetool enableauditlog
+
+```
+
+```sql
+root@aef4db03b9c5:/# cqlsh
+Connected to Test Cluster at 127.0.0.1:9042
+[cqlsh 6.2.0 | Cassandra 5.0.3 | CQL spec 3.4.7 | Native protocol v5]
+Use HELP for help.
+cqlsh> USE practica_auditoria;
+cqlsh:practica_auditoria> 
+cqlsh:practica_auditoria> CREATE TABLE usuarios (
+                      ...     id UUID PRIMARY KEY,
+                      ...     nombre TEXT,
+                      ...     email TEXT
+                      ... );
+cqlsh:practica_auditoria> INSERT INTO usuarios (id, nombre, email) 
+                      ... VALUES (uuid(), 'Carlos Ramirez', 'carlos@example.com');
+cqlsh:practica_auditoria> SELECT * FROM usuarios;
+
+ id                                   | email              | nombre
+--------------------------------------+--------------------+----------------
+ cc153535-92de-435e-a2db-4a7a451e159d | carlos@example.com | Carlos Ramirez
+
+(1 rows)
+cqlsh:practica_auditoria> INSERT INTO usuarios (id, nombre, email) 
+                      ... VALUES (uuid(), 'Maria Gonzalez', 'maria@example.com');
+cqlsh:practica_auditoria> 
+cqlsh:practica_auditoria> SELECT * FROM usuarios;
+
+ id                                   | email              | nombre
+--------------------------------------+--------------------+----------------
+ cc153535-92de-435e-a2db-4a7a451e159d | carlos@example.com | Carlos Ramirez
+ 57c71458-dc93-4ddf-a07a-415b1ebc8432 |  maria@example.com | Maria Gonzalez
+
+(2 rows)
+cqlsh:practica_auditoria> 
+```
+y si vemos lo s logs, podemos ver lo siguinete:
+
+```sql
+2025-02-24 16:00:01,123 [AuditLogger:1] INFO  com.datastax.bdp.audit.BinAuditLogger - Query: INSERT INTO usuarios (id, nombre, email) VALUES (f23d7d7c-3d62-4b2e-9175-41e8e1a2ff0e, 'Carlos Ramirez', 'carlos@example.com') 
+2019-12-31 14:12:11,234 [AuditLogger:1] INFO  com.datastax.bdp.audit.BinAuditLogger - Query: CREATE TABLE usuarios (id UUID PRIMARY KEY, nombre TEXT, email TEXT)
+2025-02-24 16:05:42,678 [AuditLogger:1] INFO  com.datastax.bdp.audit.BinAuditLogger - Query: SELECT * FROM usuarios;
+2025-02-24 16:10:13,456 [AuditLogger:1] INFO  com.datastax.bdp.audit.BinAuditLogger - Query: INSERT INTO usuarios (id, nombre, email) VALUES (d79d6db8-fbcf-4c34-bfd1-9d7a0e9a5b91, 'Maria Gonzalez', 'maria@example.com')
+```
+
+Donde nos esta dando la fecha y hora, el nivel de informacion, el componente logger , y el tipo de oepracion que estamos viendo.
+
+---
 # Bibliografía 
-
+---
 - [COMO REALIZAR UNA TRAZA DE UN USUARIO EN ORACLE](https://orasite.com/tutoriales/auditoria-de-base-de-datos-oracle/traza-trc-oracle-usuario-activar)
 - [Errores más comunes de Oracle](https://orasite.com/errores)
 - [Auditoria Mongo](https://www.mongodb.com/docs/manual/reference/database-profiler/)
+- [Cassandra](https://cassandra.apache.org/doc/stable/cassandra/operating/audit_logging.html)
