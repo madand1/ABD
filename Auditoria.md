@@ -3128,6 +3128,27 @@ Enterprise practicamotos> db.system.profile.find().sort({ ts: -1 }).limit(10).pr
 ]
 
 ```
+
+Si lo desciframos lo que nos interesa son estos trozo:
+
+```sql
+   op: 'update',
+    ns: 'practicamotos.Motos',
+    command: {
+      q: { tipo: 'Deportiva' },
+      u: { '$set': { tipo: 'Superdeportiva' } },
+```
+Podemos ver como pasa de Deportiva a Superdeportiva, y si nos vamos al final del todo, nos saldrá las siguientes líneas:
+
+```sql
+ ts: ISODate('2025-02-24T11:08:59.693Z'),
+    client: '127.0.0.1',
+    appName: 'mongosh 2.4.0',
+    allUsers: [ { user: 'andy', db: 'admin' } ],
+    user: 'andy@admin'
+```
+Vemos qu eel que hizo el cambio fue el usuario "andy" que esta autentificado en la base de datos "admin".
+
 En conclusión para los evento de autentificación y autorización, hay que mirar el archivo `/var/log/mongod/auditLog.json`. Y para operaciones, hayq ue hacer una consulta a la coleccion `system.profile` dentro de **MongoDB**.
 
 Tambien si quisieramos hacer una consula por insert a un campo en concreto tendriamos que poner lo siguiente:
@@ -3191,8 +3212,49 @@ Enterprise practicamotos> db.system.profile.find({
 ]
 ```
 
-
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
+
+Este sistema de gestión de base de datos, si que se puede hacer a una auditoria en concreto, por lo que habría que relaizar ciertos cambios en lo que es el fichero qu ehemos tocado con anterioridad `/etc/mongod.conf`, y poner lo siguiente:
+
+```sql
+auditLog:
+   destination: file
+   format: JSON
+   path: /var/log/mongodb/auditLog2.json
+   filter: '{ 
+       atype: "authCheck", 
+       "param.ns": "practicamotos.Motos", 
+       "param.command": { $in: [ "find", "insert", "delete", "update", "findandmodify" ] } 
+   }'
+
+setParameter: { auditAuthorizationSuccess: true }
+
+```
+
+Una vez hecho esto lo que tenemos que hacer es reiniciar el sistema:
+
+`sudo systemctl restart mongod.service`
+
+
+Con esto lo que vamos a conseguir es hacer una auditoría concreta en la colección Motos, por lo que aqui va alguna demostración:
+
+```sql
+{
+  "atype": "authCheck",
+  "ts": { "$date": "2025-02-24T12:30:59.693Z" },
+  "local": { "ip": "127.0.0.1", "port": 27017 },
+  "remote": { "ip": "127.0.0.1", "port": 58044 },
+  "param": {
+    "command": "insert",
+    "ns": "practicamotos.Motos",
+    "args": { "documents": [{ "marca": "Yamaha", "modelo": "R1", "año": 2024 }] }
+  },
+  "result": "success",
+  "user": "andy@admin"
+}
+```
+Por lo que si que se puede hace a colecciones especifivas.
+
 **## 11. Averigua si en Cassandra se pueden auditar las inserciones de datos.**
 
 
@@ -3200,4 +3262,4 @@ Enterprise practicamotos> db.system.profile.find({
 
 - [COMO REALIZAR UNA TRAZA DE UN USUARIO EN ORACLE](https://orasite.com/tutoriales/auditoria-de-base-de-datos-oracle/traza-trc-oracle-usuario-activar)
 - [Errores más comunes de Oracle](https://orasite.com/errores)
-- 
+- [Auditoria Mongo](https://www.mongodb.com/docs/manual/reference/database-profiler/)
