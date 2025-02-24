@@ -1320,7 +1320,10 @@ postgres=# SELECT * FROM public.emp_audit;
         7 |  7677 | messi     | 169.00 | 2025-02-22 18:41:06.861984
 (7 filas)
 ```
-Como podemos observar se ve oerfectamente reflejado.
+Como podemos observar se ve perfectamente reflejado.
+
+
+# MariaDB
 ---
 ## **8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.**
 
@@ -1508,6 +1511,11 @@ MariaDB [scott]> select * from scott.emp_auditoria;
 2 rows in set (0,000 sec)
 ```
 ---
+
+# MongoDB
+
+---
+
 ## **9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.**
 
 Para esta ocasión en este SGBD noSQL, como bien dice el enunciado, vamos  a ver que opciones de auditoria que nos ofrece MongoDB, pero para que vaya a buen puesto esta práctica tendremos que tener instalado la edición **Enterprise**,ya que la version **Community** no incluye lo que son herramientas integradas para auditorias.
