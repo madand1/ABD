@@ -298,3 +298,173 @@ expdp C###BYRON/BYRON schemas=C###BYRON dumpfile=byronfullequip.dmp logfile=byro
 
 ### Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con MySQL desde línea de comandos, documentando el proceso.
 
+En esta ocasión lo que voy a hacer es crear una base de datos con los datos anteriores, esta pase de datos se va a llamar byron, y voy a meter las tablas y datos que necesitamos, por lo que dejo por aquí dichos datos 
+
+- Creación de base de datos que vamos a exportar:
+
+![16](16.png)
+
+- Inserción de tablas y datos.
+
+![alt text](17.png) 
+
+![alt text](18.png) 
+
+![alt text](20.png) 
+
+![alt text](21.png)
+
+Una vez hecho esto, lo que tenemos que hacer es lo siguiente, que será hacer una exportación de la base de datos, por lo que vamos a usar el siguiente comando, desde la terminal fuera de la consola de MariaDB, y es el siguiente comando:
+
+`sudo mysqldump -u root byron > byronexport.sql`
+
+Donde: 
+
+- `mysqldump` → Es la herramienta que se usa para hacer copias de seguridad (exportaciones) de bases de datos en MySQL.
+- `-u root` → Indica que el usuario que ejecuta el comando es root (el administrador de MySQL).
+- `byron` → Es el nombre de la base de datos que quieres exportar.
+- `> byronexport.sql` → Guarda el contenido exportado en un archivo llamado byronexport.sql.
+
+Esto es para este caso en concreto, pero dejo por aqui el caso generico por si nos hiciera falta:
+
+`mysqldump -u [usuario] -p [nombre_base_datos] > [archivo_salida.sql]`
+
+Una vez dicho esto, lo que tendremos que hacer es ejecutarlo y ver si se hizo lo que es el fichero:
+
+![OK](22.png)
+
+
+Y como podemos observar esta todo listo y perfecto, ya tenemos la exportación realizada, ahora procederemos con la importación, por lo que voy a hacer una base de datos virgen, en este caso se va a llamar zeus, dejo por aquí su creación:
+
+![23](23.png)
+
+Y ahora procedemos a la importación por lo que esta vez, usaremos lo que es el comando para la exportación pero con unos pequeños ajustes, el cual lo dejare por aquí:
+
+`sudo mysql -u root zeus < byronexport.sql`
+
+Donde:
+
+- `mysql` → Se usa para importar datos.
+- `-u root` → Se ejecuta como el usuario root.
+- `zeus` → Es la base de datos donde se restaurarán los datos.
+- `< byronexport.sql` → Importa el contenido del archivo SQL a la base de datos zeus.
+
+Esto es para este caso en concreto, pero dejo por aqui el caso generico por si nos hiciera falta:
+
+`sudo mysql -u [usuario] -p [nombre_base_datos_que_queremos_importar] < [archivo_a_importar.sql]`
+
+Y ahora comprobamos por pantalla lo siguiente que nos ha dado y nos metemos dentro y hacemos ciertas comprobaciones:
+
+![OKIDOY](24.png)
+
+![De locos mi rey](25.png)
+
+---
+
+## Ejercicio 5
+
+### Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con Postgres desde línea de comandos, documentando el proceso.
+
+Para este ejercicio vamos a volver a usar lo que la base de datos de Scott, pero al igual que antes usaremos una base de datos llamada byron y otra llamazada zeus, por lo que vamos a crear primero las bases de datos:
+
+![creación de bases de datos](26.png)
+
+Y como podemos ver ya tenemos todo listo en lo que será nuestra base de datos byron, para poder exportarla:
+
+![Okaaaaaaaay](27.png)
+
+Ahora procedemos a exportar lo que es la base de datos, por lo que vamos a usar el siguinete comando:
+
+`sudo -u postgres pg_dump byron > byronexportado.sql`
+
+Donde:
+
+- `sudo -u postgres` → Ejecuta el comando como el usuario postgres, que es el usuario administrador por defecto en PostgreSQL.
+- `pg_dump byron` → Exporta la base de datos byron.
+- `> byronexportado.sql` → Guarda la exportación en el archivo byronexportado.sql.
+
+Y en terminos generales, el comando quedaria de la siguiente manera:
+
+
+`sudo -u [nombre_del_usuario] pg_dump [base_de_datos_a_exportar] > [archivo_salida] `
+
+![OKAAAAAAAAAAAA](28.png)
+
+Y como ya creamos con anterioridad la base de datos de zeus, la muestro para que se vea que esta vacía:
+
+![hellouda](29.png)
+
+Ahora lo que vamos a proceder es a importar dicha base de datos, anteriormente la cual era `byronexportado.sql`, con el siguiente comando:
+
+`sudo -u postgres psql -d zeus -f byronexportado.sql`
+
+Donde:
+
+- `sudo -u postgres` → Ejecuta el comando como el usuario postgres (usuario administrador de PostgreSQL).
+- `psql` → Es la herramienta de línea de comandos para interactuar con PostgreSQL.
+- `-d zeus` → Indica que la base de datos a la que se conectará es zeus.
+- `-f byronexportado.sql` → Especifica el archivo SQL que se importará.
+
+Y veremos lo siguiente por pantalla:
+
+![De locos](30.png)
+
+Y ahora nos metemos dentro y hacemos las comprobaciones para ver si se han hecho perfectamente:
+
+![Volaaaaaaaaaaaaaandddddo](31.png)
+
+---
+
+## Ejercicio 6
+
+### Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.
+
+Para este ejercicio voy a crear en mi SGBD no relacional, una base de datos llamada `aprobare` y donde tendre una colección llaamda `articulos`, de los cuales solo vamos a exportar los documentos donde sean de tipo `Libros`.
+
+Por lo que para exportar en mongo tendremos que usar el siguiente comando:
+
+`mongoexport -u andy -p andy --authenticationDatabase admin --db aprobare --collection articulos --query "{\"tipo\":\"Libros\"}" --out exportacion-accesorios.json`
+
+Donde: 
+
+- `mongoexport`: Herramienta de línea de comandos utilizada para exportar datos desde MongoDB hacia un archivo (puede ser JSON o CSV)
+- `-u andy`: Nombre de usuario que se usará para la autenticación en MongoDB
+- `-p andy`: Contraseña del usuario andy.
+- `--authenticationDatabase admin`: Define la base de datos que se utiliza para autenticar al usuario.
+- `--db aprobare`: La base de datos en la que se encuentra la colección de la cual se exportarán los datos
+- `--collection articulos`: Es el nombre de la colección de la cual se exportarán los datos.
+- `--query "{\"tipo\":\"Libros\"}"`: Es el filtro en formato JSON
+- `--out exportacion-accesorios.json`: Es el archivo donde se guardarán los datos exportados.
+
+Por pantalla nos aparece lo siguiente:
+
+![EEEEEEEEEEEEEEEEEESpartaco](32.png)
+
+Lo que acabamos de ver en la captura de arriba, es como ha codigo con el filtro que le pusimos el cual es Librosm y este lo qu eha hecho es pasarlo al fichero con extension .json, y en el cual como se puede ver, estan almacenados, por lo que ahora con la exportación realizada, vamos a proceder a hacer la importación.
+
+Como tengo de anteriores pruebas varias bases de datos, voy a meterlo en `pratcicamotos`, muestro en pantalla las colecciones que tengo:
+
+![Collections](33.png)
+
+Por lo que procedere a importar lo que es el json que hicimos con anterioridad.
+
+`mongoimport -u andy -p andy --authenticationDatabase admin --db pratcicamotos --collection articulos --file exportacion-accesorios.json`
+
+Donde:
+
+- `mongoimport`: Es la herramienta utilizada para importar datos en MongoDB desde un archivo (JSON, CSV, TSV).
+- `-u andy`: Identidad de nuetsro usuario.
+- `-p andy`: Contraseña de nuetsro usuario.
+- `--authenticationDatabase admin`: Especifica la base de datos para la autenticación. 
+- `--db pratcicamotos`: Especifica la base de datos de destino donde se importarán los datos.
+- `--collection articulos`: Especifica la colección en la que se van a importar los datos. 
+- `--file exportacion-accesorios.json`: Define el archivo que se va a importar.
+Como podemos ver por pantalla se han importado:
+
+![alt text](34.png)
+
+Pero para asegurarnos lo que vamos a hacer es entrar en la base de datos de `pratcicamotos` y ver las colecciones y ver que hay dentro:
+
+![Espectaculo](35.png)
+
+
