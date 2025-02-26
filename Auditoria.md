@@ -3221,7 +3221,7 @@ Enterprise practicamotos> db.system.profile.find({
 ```
 
 
-**## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
+## **10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
 
 Este sistema de gestión de base de datos, si que se puede hacer a una auditoria en concreto, por lo que habría que relaizar ciertos cambios en lo que es el fichero qu ehemos tocado con anterioridad `/etc/mongod.conf`, y poner lo siguiente:
 
