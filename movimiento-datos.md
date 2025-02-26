@@ -467,4 +467,8 @@ Pero para asegurarnos lo que vamos a hacer es entrar en la base de datos de `pra
 
 ![Espectaculo](35.png)
 
+---
 
+## Ejercicio 7
+
+### SQL*Loader es una herramienta que sirve para cargar grandes volúmenes de datos en una instancia de ORACLE. Exportad los datos de una base de datos completa desde MariaDB a texto plano con delimitadores y emplead SQL*Loader para realizar el proceso de carga de dichos datos a una instancia ORACLE. Debéis documentar todo el proceso, explicando los distintos ficheros de configuración y de log que tiene SQL*Loader.
