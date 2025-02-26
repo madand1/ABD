@@ -3220,48 +3220,116 @@ Enterprise practicamotos> db.system.profile.find({
 ]
 ```
 
+
 **## 10. Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.**
 
 Este sistema de gestión de base de datos, si que se puede hacer a una auditoria en concreto, por lo que habría que relaizar ciertos cambios en lo que es el fichero qu ehemos tocado con anterioridad `/etc/mongod.conf`, y poner lo siguiente:
 
-```sql
+Al final me di cuenta de que realmente es más sencillo de hacer ya que hay que modificar simplemente el fichero `/etc/mongod.conf`, y poner lo siguiente:
+
+```bash
 auditLog:
-   destination: file
-   format: JSON
-   path: /var/log/mongodb/auditLog2.json
-   filter: '{ 
-       atype: "authCheck", 
-       "param.ns": "practicamotos.Motos", 
-       "param.command": { $in: [ "find", "insert", "delete", "update", "findandmodify" ] } 
-   }'
-
-setParameter: { auditAuthorizationSuccess: true }
-
+  destination: file
+  format: JSON
+  path: /var/log/mongodb/auditLog_alcalde.json
+  filter: '{ atype: "authCheck", "param.ns": "alcalde.productos", "param.command": { $in: ["insert", "update", "delete", "find"] } }'
+setParameter:
+  auditAuthorizationSuccess: true
 ```
+
+Donde:
+
+- `Path`: Es la ruta del fichero que vamos a meter, para cada auditoria, por lo que tenemos que cambiarla, en el caso de que queramos otra, por ejemplo motos , coches o productos.
+
+- `filter`: En este lo que tenemos que hacer es meter los filtros que necesitamos, y obviamente tenemos que meter en el param.ns: la base de datos y la colección a la que vamos a hacer la auditoria.
+
+Luego de esto hacemos un reinicio.
+
 
 Una vez hecho esto lo que tenemos que hacer es reiniciar el sistema:
 
 `sudo systemctl restart mongod.service`
 
 
-Con esto lo que vamos a conseguir es hacer una auditoría concreta en la colección Motos, por lo que aqui va alguna demostración:
+Con esto lo que vamos a conseguir es hacer una auditoría concreta en la colección productos, por lo que aqui va alguna demostración:
 
 ```sql
+andy@debian:~$ sudo cat /var/log/mongodb/auditLog_alcalde.json | jq
 {
   "atype": "authCheck",
-  "ts": { "$date": "2025-02-24T12:30:59.693Z" },
-  "local": { "ip": "127.0.0.1", "port": 27017 },
-  "remote": { "ip": "127.0.0.1", "port": 58044 },
+  "ts": {
+    "$date": "2025-02-26T09:46:32.961+01:00"
+  },
+  "uuid": {
+    "$binary": "J5jUPV2PQP6+FIlaNGiwlw==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 49684
+  },
+  "users": [
+    {
+      "user": "andy",
+      "db": "admin"
+    }
+  ],
+  "roles": [
+    {
+      "role": "root",
+      "db": "admin"
+    }
+  ],
   "param": {
     "command": "insert",
-    "ns": "practicamotos.Motos",
-    "args": { "documents": [{ "marca": "Yamaha", "modelo": "R1", "año": 2024 }] }
+    "ns": "alcalde.productos",
+    "args": {
+      "insert": "productos",
+      "documents": [
+        {
+          "_id": 5,
+          "nombre": "Audífonos",
+          "precio": 80,
+          "stock": 30
+        },
+        {
+          "_id": 6,
+          "nombre": "Silla Gamer",
+          "precio": 250,
+          "stock": 15
+        },
+        {
+          "_id": 7,
+          "nombre": "Tarjeta Gráfica",
+          "precio": 600,
+          "stock": 5
+        },
+        {
+          "_id": 8,
+          "nombre": "Disco Duro SSD",
+          "precio": 150,
+          "stock": 20
+        }
+      ],
+      "ordered": true,
+      "lsid": {
+        "id": {
+          "$binary": "hnEMx1pPTRmopToUIeqMqA==",
+          "$type": "04"
+        }
+      },
+      "$db": "alcalde"
+    }
   },
-  "result": "success",
-  "user": "andy@admin"
+  "result": 0
 }
+
 ```
-Por lo que si que se puede hace a colecciones especifivas.
+Por lo que si que se puede hace a colecciones especificas.
 
 ---
 
