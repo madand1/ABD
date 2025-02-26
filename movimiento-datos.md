@@ -294,3 +294,7 @@ expdp C###BYRON/BYRON schemas=C###BYRON dumpfile=byronfullequip.dmp logfile=byro
 
 ![12+1](13+1.png)
 
+## Ejercicio 4
+
+### Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con MySQL desde línea de comandos, documentando el proceso.
+
