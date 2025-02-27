@@ -472,3 +472,281 @@ Pero para asegurarnos lo que vamos a hacer es entrar en la base de datos de `pra
 ## Ejercicio 7
 
 ### SQL*Loader es una herramienta que sirve para cargar grandes volúmenes de datos en una instancia de ORACLE. Exportad los datos de una base de datos completa desde MariaDB a texto plano con delimitadores y emplead SQL*Loader para realizar el proceso de carga de dichos datos a una instancia ORACLE. Debéis documentar todo el proceso, explicando los distintos ficheros de configuración y de log que tiene SQL*Loader.
+
+
+Para este ejercicio voy a utiliza la base de datos llamada **byron** que la tenemos en nuestro SGBD PostgreSQL.
+
+¿Que vamos a hacer con esos datos?
+
+Pues los vamos a exportar a un fichero `csv`, y luego lo importare a nuestra base de datos Oracle.
+
+Por lo que a continuación vooy a dejar la función de exportación a CSV.
+
+- Función de exportado a CSV.
+
+Esta función que estoy a punto de dejar a continuación, nos va a permitir exportar a un fichero CSV, los datos de dicha base de datos.
+
+```sql
+CREATE OR REPLACE FUNCTION export_csv(name_tab TEXT, ruta TEXT)
+    RETURNS VOID AS $$
+    DECLARE
+        name_tab TEXT;
+    BEGIN
+        FOR name_tab IN
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_type = 'BASE TABLE'
+        LOOP
+            EXECUTE format (
+                'COPY %I TO %L WITH (FORMAT CSV, DELIMITER '','', HEADER TRUE)', name_tab, ruta || name_tab || '.csv'
+            );
+        END LOOP;
+    END;
+    $$ LANGUAGE plpgsql;
+```
+
+Esta función es genérica, por lo que nos va a valer para **TODAS** las bases de datos, ya que la función la tendremos que ejecutar con el siguiente comando, indicando el nombre de la base de datos, y la ruta donde la queremos.
+
+```sql
+SELECT export_csv('byron', '/home/andy/' );
+
+Todo esto que acabo de hacer lo tendriamos que hacer desde la base de datos que queramos realizar, me refiero, que en mi caso es `byron`, pues entonces tendrás que entar de la siguiente manera:
+
+```bash
+andy@postgreSQL:~$ sudo -u postgres psql -d byron
+[sudo] contraseña para andy: 
+psql (15.9 (Debian 15.9-0+deb12u1))
+Digite «help» para obtener ayuda.
+
+byron=# 
+```
+Una vez dentro confirmo que esten dichas tablas:
+
+```sql
+byron=# \dt
+         Listado de relaciones
+ Esquema |  Nombre  | Tipo  |  Dueño   
+---------+----------+-------+----------
+ public  | bonus    | tabla | postgres
+ public  | dept     | tabla | postgres
+ public  | emp      | tabla | postgres
+ public  | salgrade | tabla | postgres
+(4 filas)
+```
+Una vez confirmado esto procedemos a meter la función anteriormente escrita:
+
+![Yokai](36.png)
+
+Como podemos ver se creo sin ningún tipo de problemas, por lo que ahora procederemos a realizar la exportación, para ello como comentamos anteriormente haremos uso de la función:
+
+```sql
+andy@postgreSQL:~$ sudo -u postgres psql -d byron
+psql (15.9 (Debian 15.9-0+deb12u1))
+Digite «help» para obtener ayuda.
+
+byron=# SELECT export_csv('byron', '/home/andy/' );
+ export_csv 
+------------
+ 
+(1 fila)
+```
+Con esto ya estaría ready, pero me dío un fallo el cual dejo comentado en este [script](./fallo.md) para no ensuciar el documento.
+
+Una vez realizado todo esto, vamos a comprobar que si que se han exportado, por lo que tenemos que echar un vistazo al directorio donde se creo:
+
+
+![nah de locos](37.png)
+
+
+Como podemos observar se exportaron las cuatro tablas, a fichero `csv`, por lo que ahora tendremos que pasarlo a nuestra máquina donde tenemos se servidor de Oracle, por lo que hare uso de **scp**.
+
+![Pasado pisado](38.png)
+
+Una vez pasado lo que hacemos es comprobar que estan en el directorio `/home/oracle/`:
+
+![Yoaeeee](39.png)
+
+Una vez hecho esto vamos a proceder a crear lo que son fichero de control, en los cual voy a definir lo siguinete:
+
+- `Archivo de datos` el cual se va a importar.
+- `Formato de los datos`.
+- `La tabla de destino en Oracle`
+- `Las columnas y su mapeo`: En la tabla de Oracle
+
+
+Por lo que cada tabla va a tener un **fichero de control**, como he pasado las 4 tablas vamos a importar las 4.
+
+- Fichero de control para DEPT.
+
+```sql
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/dept.csv'
+APPEND
+INTO TABLE dept
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(deptno, dname, loc)
+```
+
+Donde:
+
+- `OPTIONS (SKIP=1)`: Con esto indicams que se omite la primera fila del archivo CSV.
+- `LOAD DATA`: Inicia la carga de datos con SQL*Loader.
+- `INFILE '/home/oracle/dept.csv'`: Escpecifco el archivo CSV.
+- `APPEND`: Agrega los datos sin borrar los existentes.
+- `INTO TABLE dept`: Especificamos la tabla de destino en Oracle.
+- `FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'`: Indicamos que los campos estan sperados por comas.
+- `TRAILING NULLCOLS`: Si alguna columna esta vacia se rellena con NULL.
+- `(deptno, dname, loc)`: Definimos las comunas de destino en la tabla dept.
+
+
+Esta ultima opción lo vemos con un cat, aquí lo dejo:
+
+```bash
+oracle@madand1:~$ cat dept.csv 
+deptno,dname,loc
+10,ACCOUNTING,NEW YORK
+20,RESEARCH,DALLAS
+30,SALES,CHICAGO
+40,OPERATIONS,BOSTON
+```
+
+- Fichero de control para EMP.
+
+```sql
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/emp.csv'
+APPEND
+INTO TABLE emp
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    EMPNO,
+    ENAME,
+    JOB,
+    MGR NULLIF MGR=BLANKS, -- Esto es por si esta vacío que me lo ponag como NULL
+    HIREDATE DATE "YYYY-MM-DD",
+    SAL DECIMAL EXTERNAL,
+    COMM DECIMAL EXTERNAL NULLIF MGR=BLANKS, -- Esto es por si esta vacío que me lo ponag como NULL
+    DEPTNO
+)
+
+```
+
+- Ficjhero de control para BONUS.
+
+```sql
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/bonus.csv'
+APPEND
+INTO TABLE bonus
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+  EMPNO INTEGER, -- Aseguro con esto que sean numeros entero de empleados.
+  BONUS DECIMAL EXTERNAL --Permite cargar los valores.
+)
+```
+
+- Fichero de control Salgrade.
+
+```sql
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/salgrade.csv'
+APPEND
+INTO TABLE salgrade
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+(
+  GRADE    INTEGER,
+  LOSAL    DECIMAL EXTERNAL,
+  HISAL    DECIMAL EXTERNAL
+)
+```
+
+Ahora que los tenemos hecho, lo dejo para que lo podais, ver:
+
+
+![alt text](40.png) 
+
+![alt text](41.png)
+
+Ahora una vez hecho esto lo que voy a hacer es coger e importarlo a lo Oracle, por lo que crearemos un nuevo usuario para poder importar estos datos.
+
+Este usuario se va llamar C###ODIN/ODIN
+
+![Listo calisto](42.png)
+
+Una vez creado lo que tenemos que hacer es crear las tablas en el usuario `C###ODIN`,
+
+
+![Tablas listas](43.png)
+
+Ahora que tenemos las tablas listas, lo que hacemos es salirnos, de oracle, y ponernos en la terminal,  y lo que vamos a hacer es importar los datos.
+
+`sqlldr C###ODIN/ODIN control=/home/oracle/dept.ctl log=/home/oracle/dept.log`
+
+![YOOOOOOOOOOOOOOO](44.png)
+
+`sqlldr C###ODIN/ODIN control=/home/oracle/emp.ctl log=/home/oracle/emp.log`
+
+![IEEEEEEEEEEEE](45.png)
+
+Estas dos tablas, han tenido exito, pero las dos siguientes no:
+
+
+`sqlldr C###ODIN/ODIN control=/home/oracle/bonus.ctl log=/home/oracle/bonus.log`
+
+![Fatalityaaaa](47.png)
+
+`sqlldr C###ODIN/ODIN control=/home/oracle/salgrade.ctl log=/home/oracle/salgrade.log`
+
+![Falatlity](46.png)
+
+Por lo que vamos a mirar los logs:
+
+![Losga](48.png)
+
+Esto esta ocurriendo porque la columan `GRADE` esta definida con un tipo de dato con mnor precidion de la necesaria, es decir que hay que cambiar los valores para que acept los valos que tenemos en los CSV.
+
+Por lo que ahora iremos con las comprobaciones de que se importaron bien las demás, por agilizar esta práctcia.
+
+![Perfect a medias](49.png)
+
+Y como podemos observar se ha importado todo perfectamente.
+
+## Bonustrack
+
+Como lo estoy haciendo con las tablas que ya tenia hechas, lo que voy a realizar es un ejercicio donde en Postgres, voy a crear una base de datos, y metere alguna tabla, con inserciones, y lo voy a volver a meter en lo que es Oracle, gracias al SQL*Loader.
+
+Voy a proceder a ello entonces, esta será la tabla que meteré:
+
+```sql
+CREATE TABLE ventas (
+    producto_codigo CHAR(6),    
+    precio DECIMAL(10, 3),      
+    hora_venta TIME             
+);
+
+INSERT INTO ventas (producto_codigo, precio, hora_venta)
+VALUES 
+    ('P00001', 19.990, '09:15:00'),  
+    ('P00002', 34.500, '11:45:30'),  
+    ('P00003', 89.990, '14:00:00'),  
+    ('P00004', 12.349, '16:10:10'),  
+    ('P00005', 22.500, '18:20:15');  
+```
+Por pantalla veo lo siguiente:
+
+![alt text](50.png) 
+
+![alt text](51.png)
+
+
+
+
+---
