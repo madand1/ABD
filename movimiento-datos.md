@@ -510,6 +510,7 @@ Esta función es genérica, por lo que nos va a valer para **TODAS** las bases d
 
 ```sql
 SELECT export_csv('byron', '/home/andy/' );
+```
 
 Todo esto que acabo de hacer lo tendriamos que hacer desde la base de datos que queramos realizar, me refiero, que en mi caso es `byron`, pues entonces tendrás que entar de la siguiente manera:
 
@@ -721,6 +722,8 @@ Y como podemos observar se ha importado todo perfectamente.
 
 ## Bonustrack
 
+### Ejercicio 1
+
 Como lo estoy haciendo con las tablas que ya tenia hechas, lo que voy a realizar es un ejercicio donde en Postgres, voy a crear una base de datos, y metere alguna tabla, con inserciones, y lo voy a volver a meter en lo que es Oracle, gracias al SQL*Loader.
 
 Voy a proceder a ello entonces, esta será la tabla que meteré:
@@ -734,11 +737,11 @@ CREATE TABLE ventas (
 
 INSERT INTO ventas (producto_codigo, precio, hora_venta)
 VALUES 
-    ('P00001', 19.990, '09:15:00'),  
-    ('P00002', 34.500, '11:45:30'),  
-    ('P00003', 89.990, '14:00:00'),  
-    ('P00004', 12.349, '16:10:10'),  
-    ('P00005', 22.500, '18:20:15');  
+    ('P00001', 19,990, '09:15:00'),  
+    ('P00002', 34,500, '11:45:30'),  
+    ('P00003', 89,990, '14:00:00'),  
+    ('P00004', 12,349, '16:10:10'),  
+    ('P00005', 22,500, '18:20:15');  
 ```
 Por pantalla veo lo siguiente:
 
@@ -819,6 +822,122 @@ P00005;22,500;18:20:15
 
 Eso ya es vuestra elección de lo que querais.
 
+### Ejercicio 2
 
+Ahora voy a crear una tabla sin decimales, por lo que hare lo siguiente, en PostgreSQL, por lo que creare una base de datos:
+
+```sql
+CREATE TABLE empleados (
+    nombre VARCHAR(100),       
+    salario INT,                
+    fecha_contratacion DATE     
+);
+```
+Y metemos datos:
+
+```sql
+INSERT INTO empleados (nombre, salario, fecha_contratacion) 
+VALUES 
+    ('Andres Morales', 25000, '2021-06-15'),
+    ('Alejandro Liañez', 30000, '2019-03-01'),
+    ('Pablo Martin', 28000, '2022-09-20'),
+    ('Pato Patoso', 22000, '2020-11-10');
+```
+Lo podemos ver por pantalla:
+
+![alt text](60.png)
+
+Ahora le metemos la función anterior:
+
+
+```bash
+CREATE OR REPLACE FUNCTION export_csv(name_tab TEXT, ruta TEXT)
+    RETURNS VOID AS $$
+    DECLARE
+        name_tab TEXT;
+    BEGIN
+        FOR name_tab IN
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_type = 'BASE TABLE'
+        LOOP
+            EXECUTE format (
+                'COPY %I TO %L WITH (FORMAT CSV, DELIMITER '','', HEADER TRUE)', name_tab, ruta || name_tab || '.csv'
+            );
+        END LOOP;
+    END;
+    $$ LANGUAGE plpgsql;
+```
+
+Y hacemos la selección, de la función:
+
+```sql
+SELECT export_csv('patoso', '/home/andy/' );
+```
+Y observamos por pantalla:
+
+![alt text](61.png)
+
+Como anteriormente lo pasamos a lo que será a la base de datos de Oracle con scp.
+
+![alt text](62.png)
+
+Ahroa en la base de datos de oracle, lo que tengo que hacer es crear un usuario y crear su tabla:
+
+![alt text](63.png)
+
+La tabla esta que cree esta mal ya que me di cuenta tarde, por lo que estaria de la siguinete forma:
+
+```sql
+SQL> DROP TABLE empleados;
+
+Tabla borrada.
+
+SQL> CREATE TABLE empleados (
+    nombre VARCHAR2(100),
+    salario NUMBER(10),  -- Tipo de dato correcto para salario
+    fecha_contratacion DATE
+);  2    3    4    5  
+
+Tabla creada.
+
+```
+
+AHora comprobamos que tenemos el ``empleados.csv``, y lo que hacemos es crear su fichero de control
+
+- Fichero de control:
+```bash 
+
+oracle@madand1:~$ cat empleados.ctl 
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/empleados.csv'
+APPEND
+INTO TABLE empleados
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    nombre,
+    salario ,
+    fecha_contratacion "TO_DATE(:fecha_contratacion, 'YYYY-MM-DD')"
+)
+```
+Y ahora lo ejecutamos:
+
+```bash
+sqlldr C###BONUSTRACK2/BONUSTRACK2 control=/home/oracle/empleados.ctl log=/home/oracle/empleados.log
+```
+
+![alt text](64.png)
+
+Y ahora nos logueamos como `C###BONUSTRACK2/BONUSTRACK2` y vemos si esta todo importado:
+
+![alt text](65.png)
+
+
+Y con esto ya sabriamos hacer la importacion usando la herramienta que nos proporciona Oracel, la cual es SQL*Loader.
+
+Espero que os haya servido, y por si algún dia decaeis, redordar, el que pierde es el que se rinde.
 
 ---
