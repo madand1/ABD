@@ -28,6 +28,7 @@
 
 - [12. Auditoría](./Auditoria.md)
 - [13. Movimientos de datos](./movimiento-datos.md)
+- [14. Copias de Seguridad y Restauración](./seguridad.md)
 
 ## Autor :computer:
 * Andrés Morales González

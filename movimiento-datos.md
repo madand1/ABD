@@ -772,15 +772,15 @@ Ahora lo que hago es crear lo que será el fichero de contro de ventas, quedarí
 oracle@madand1:~$ cat ventas.ctl 
 OPTIONS (SKIP=1)
 LOAD DATA
-INFILE '/home/oracle/dept.csv'
+INFILE '/home/oracle/ventas.csv'
 APPEND
 INTO TABLE ventas
-FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+FIELDS TERMINATED BY ';' OPTIONALLY ENCLOSED BY '"'
 TRAILING NULLCOLS
 (
-    producto_codigo CHAR(6),
+    producto_codigo ,
     precio DECIMAL EXTERNAL,
-    hora_venta "HH24:MI:SS"
+    hora_venta "TO_DATE(:hora_venta, 'HH24:MI:SS')"
 )
 ```
 Ahora en Oracle lo que hago es crear un usuario, al cual llamare `C###BONUSTRACK/BONUSTRACK`
@@ -793,7 +793,10 @@ Ahora lo que hacemos es crear la tabla en lo que es dentro del usuario recien cr
 
 Ahora lo que hacemos es salir de la terminal de Oracle, y vamos a importar los datos, con el siguinete comando:
 
-`sqlldr C###BONUSTRACK/BONUSTRACK control=/home/oracle/ventas.ctl log=/home/oracle/ventas.log`
+```bash 
+sqlldr C###BONUSTRACK/BONUSTRACK control=/home/oracle/ventas.ctl log=/home/oracle/ventas.log
+```
+
 
 ![Espo](57.png)
 
@@ -938,6 +941,6 @@ Y ahora nos logueamos como `C###BONUSTRACK2/BONUSTRACK2` y vemos si esta todo im
 
 Y con esto ya sabriamos hacer la importacion usando la herramienta que nos proporciona Oracel, la cual es SQL*Loader.
 
-Espero que os haya servido, y por si algún dia decaeis, redordar, el que pierde es el que se rinde.
+Espero que os haya servido, y por si algún dia decaeis, redordar, **el que pierde es el que se rinde**.
 
 ---
