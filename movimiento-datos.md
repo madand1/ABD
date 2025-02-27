@@ -746,6 +746,78 @@ Por pantalla veo lo siguiente:
 
 ![alt text](51.png)
 
+Como mencione anteriormente tengo que meter lo que es la función, que cree asi que procedo a ello:
+
+![SSSSSSSSSSSSSSpartaco](52.png)
+
+Ahora procedo a exportar el csv, ejecutando la fucnión:
+
+`SELECT export_csv('bonustrack', '/home/andy/' );`
+
+COmo vemos por pantalla ha tenido exito:
+
+![Hieeeepa](53.png)
+
+
+Ahora como anteriormente lo que hago es pasarlo por scp, a donde tenemos la base de datos de Oracle.
+
+![AAAAAAAAAAAAAAAAAAAAAAAA](54.png)
+
+Ahora lo que hago es crear lo que será el fichero de contro de ventas, quedaría tal que así:
+
+```sql
+oracle@madand1:~$ cat ventas.ctl 
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/oracle/dept.csv'
+APPEND
+INTO TABLE ventas
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    producto_codigo CHAR(6),
+    precio DECIMAL EXTERNAL,
+    hora_venta "HH24:MI:SS"
+)
+```
+Ahora en Oracle lo que hago es crear un usuario, al cual llamare `C###BONUSTRACK/BONUSTRACK`
+
+![Creacieón de C###BONUSTRACK](55.png)
+
+Ahora lo que hacemos es crear la tabla en lo que es dentro del usuario recien creado, por lo que nos vamos a conectar.
+
+![Espppp](56.png)
+
+Ahora lo que hacemos es salir de la terminal de Oracle, y vamos a importar los datos, con el siguinete comando:
+
+`sqlldr C###BONUSTRACK/BONUSTRACK control=/home/oracle/ventas.ctl log=/home/oracle/ventas.log`
+
+![Espo](57.png)
+
+Y ahora entramos y comprobamos:
+
+![alt text](59..png)
+
+
+Tuve un percance a la hora de importar los datos, ya que en el `ventas.csv` el precio estaba separado por . es decir el separador del decimal es un punto, pero en Oracle espera que sea una coma (,), por lo que habría dos opciones para que funcione:
+
+- Alterar lo que es el fichero ventas.csv, y quedara de la siguiente manera:
+
+```sql
+producto_codigo;precio;hora_venta
+P00001;19,990;09:15:00
+P00002;34,500;11:45:30
+P00003;89,990;14:00:00
+P00004;12,349;16:10:10
+P00005;22,500;18:20:15
+
+```
+
+- Cambiar la configuración de la sesión en Oracle, con el siguiente comando:
+
+`ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '. ';`
+
+Eso ya es vuestra elección de lo que querais.
 
 
 
