@@ -488,7 +488,9 @@ Y ahora lo que tendriamos que hacer es una comprobación como antes:
 ![TOOOOOOOOOOP OF THE WORLDDDD](r45.png)
 
 ---
+# PostgreSQL
 
+---
 # Ejercicio 6
 
 ## Documenta el empleo de las herramientas de copia de seguridad y restauración de Postgres.
