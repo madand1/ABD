@@ -1,6 +1,8 @@
 # Copias de seguridad y restauración.
 
 ---
+# Oracle
+---
 # Ejercicio 1
 
 ## Realiza una copia de seguridad lógica de tu base de datos completa, teniendo en cuenta los siguientes requisitos:
@@ -100,6 +102,7 @@ Lo que hemos hecho es programar lo que es la copia de seguridad a las 2 am, he u
 
 Si quisieramos otra hora solo tendriamos que modificar la linea los números.
 
+---
 # Ejercicio 2
 
 ## Restaura la copia de seguridad lógica creada en el punto anterior.
@@ -305,6 +308,7 @@ Esto nos mostrara por pantalla lo siguiente, que es lo que se restaurará en la 
 
 Por lo que ya hemos realizado la copia de seguridad.
 
+---
 # Ejercicio 4
 
 ##  Borra un fichero de datos de un tablespace e intenta recuperar la instancia de la base de datos a partir de la copia de seguridad creada en el punto anterior.
@@ -398,7 +402,7 @@ SQL> COLUMN ENAME FORMAT A10;
 SQL> COLUMN JOD FORMAT A10;
 SQL> COLUMN HIREDATE FORMAT A10;
 ```
-
+---
 # Ejercicio 5
 ##  Borra un fichero de control e intenta recuperar la base de datos a partir de la copia de seguridad creada en el punto anterior.
 
@@ -482,3 +486,5 @@ Y ahora lo que tendriamos que hacer es una comprobación como antes:
 - Como al meternos como sysdba, nos sale las tablas del usuario `C###BYRON`
 
 ![TOOOOOOOOOOP OF THE WORLDDDD](r45.png)
+
+---
