@@ -624,6 +624,10 @@ Por lo que si queremos hacer una copia a las dos de la mañana tendremos que añ
 Y con esto ya estaría este ejercicio.
 
 ---
+
+# MariaDB 
+---
+
 # Ejercicio 7
 ## Documenta el empleo de las herramientas de copia de seguridad y restauración de MySQL.
 
