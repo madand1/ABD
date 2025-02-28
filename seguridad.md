@@ -385,7 +385,7 @@ Y ahora lo que haremos será verificar de este todo cargado en usuario `C###BYRO
 
 ![alt text](r34.png)
 
-Esto es una bomba, que nos ha funcionado, y vemos como esta todo restaurado.
+Esto es una bomba, ya que vemos como nos ha funcionado, y vemos como esta todo restaurado.
 
 Nota:
 
@@ -398,3 +398,87 @@ SQL> COLUMN ENAME FORMAT A10;
 SQL> COLUMN JOD FORMAT A10;
 SQL> COLUMN HIREDATE FORMAT A10;
 ```
+
+# Ejercicio 5
+##  Borra un fichero de control e intenta recuperar la base de datos a partir de la copia de seguridad creada en el punto anterior.
+
+Como hemos hecho anteriormente, es decir en el ejercicio anterior es ver si existe un fichero de control en nuestro backup, por lo qe nos vamos a conectar a **RMAN** y meteremos los siguientes comandos:
+
+```bash
+rman target =/ catalog RMAN/RMAN
+```
+y una vez dentro meteremos el siguiente para liostar si existe en nuestra copia de seguridad el fichero de control.
+
+```sql
+list backup of controlfile;
+```
+
+![alt text](r35.png)
+
+Y como podemos observar tenemos 3 copias de seguridad las cuales encuentran este fichero, por lo que como la última copia de seguridad es esta `/opt/oracle/product/19c/dbhome_1/dbs/c-2956370217-20250228-02`, es la que voy a restaurar.
+
+⚠️ **Importante:**Es crucial guardar esta ruta, ya que si el archivo de control se elimina, la base de datos no podrá montarse correctamente y RMAN no podrá acceder al catálogo creado previamente. Por ello, es necesario especificar la ruta completa del archivo para restaurar la copia.
+
+Si nos vamos al siguiente directorio `/opt/oracle/oradata/ORCLCDB` encontraremos dos ficheros de control, por lo que voy a mover uno de ellos como anteriormente hice con el users, dejo por aquí los comandos:
+
+![alt text](r36.png)
+
+Ahora despues de esto borramos el control, que movimos y nos meteremos en sqlplus, y haremos lo siguiente:
+
+```sql
+SHUTDOWN ABORT;
+STARTUP NOMOUNT;
+```
+
+![alt text](r37.png)
+
+
+Luego de esto y en la misma sesión lo que hacemos es pregunbtar por lo empleados del usuario `C###BYRON`:
+
+![alt text](r39.png)
+
+Y como podemos observar estos no responde y nos da el fallo `ORA-01219`
+
+Ahora salimos de la sesión de sqlplus, y nos conectamos con nuestro usuario a `NRAM`:
+
+```bash
+rman target =/ catalog RMAN/RMAN
+```
+
+Pero este nos va a decir que no se puede conectar al catalogo:
+
+![YEEEEEEEEEEEa](r40.png)
+
+Por lo que para poder hacer la restauración lo que haremos sera conectanor a `RMAN` de una forma nomral, y ejecutar el siguiente comando, para el cual vamos a hacer uso de la ruta del fichero que dijimos con anterioridad.
+
+```bash
+rman target =/
+```
+
+Y donde haremos uso del siguinete comando:
+
+```sql
+restore controlfile from '/opt/oracle/product/19c/dbhome_1/dbs/c-2956370217-20250228-02';
+```
+
+![Restaurado](r41.png)
+
+Ahora una vez listo, lo que haremos siguiendo en la misma terminal es lo siguiente, es recuperar la base de datos, volver a montarla, una recuperación y resetar los logs.
+
+```sql
+alter database mount;
+recover database;
+alter database open resetlogs;
+```
+
+![alt text](r42.png)
+
+Y ahora lo que tendriamos que hacer es una comprobación como antes:
+
+- Vemos como entra con nuetsro usuario `RMAN/RMAN`
+
+![alt text](r44.png)
+
+- Como al meternos como sysdba, nos sale las tablas del usuario `C###BYRON`
+
+![TOOOOOOOOOOP OF THE WORLDDDD](r45.png)
