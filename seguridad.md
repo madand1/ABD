@@ -624,3 +624,94 @@ Por lo que si queremos hacer una copia a las dos de la mañana tendremos que añ
 Y con esto ya estaría este ejercicio.
 
 ---
+# Ejercicio 7
+## Documenta el empleo de las herramientas de copia de seguridad y restauración de MySQL.
+
+En este **SGBD relacional**, podemos encontrar varias herramientas para hacer lo que es las copias de seguridad o backup, por lo que os voy a mostrar algunas de ellas.
+
+- `mysqldump`:Es una herramienta que permite generar copias de seguridad de bases de datos MySQL en formato de texto plano. Puede utilizarse para respaldar una base de datos completa, una o varias tablas específicas. Los archivos generados contienen las instrucciones SQL necesarias para recrear tanto la estructura de la base de datos como sus datos.
+- `MySQL Enterprise Backup`: Forma parte de MySQL Enterprise Edition y ofrece una solución avanzada para la copia de seguridad y restauración de bases de datos MySQL. Permite realizar copias de seguridad en caliente mediante snapshots, así como respaldos incrementales y restauraciones en un punto específico en el tiempo, optimizando la disponibilidad y el rendimiento del sistema.
+- `Percona XtraBackup`:Es una herramienta de respaldo y recuperación diseñada para bases de datos MySQL y Percona Server. Permite realizar copias de seguridad en caliente mediante snapshots, minimizando el tiempo de inactividad. A pesar de ser una solución robusta y ampliamente utilizada, ha quedado algo rezagada en comparación con alternativas más recientes.
+
+Nosotros nos vamos a centrar en la herramienta `mysqldump` para poder hacer lo que son las copias de seguridad o backup, por lo que usaremos el siguiente comando:
+
+```bash 
+sudo mysqldump -u root -p --all-databases > backup/copia_seguridad-mariadb.sql
+```
+
+Lo que hacemos con esto es coger y hacer una copia de seguridad con dicho comando, en el cual se va a guardar todo en `copia_seguridad-mariadb.sql` el cual va a estar todo en el directorio `backup`.
+
+Dejo por aquí la comprobación:
+
+![CReación de seguridad en mariadb](m1.png)
+
+Y si queremos ver que se hizo realmente podemos hacer un **cat** del fichero que acabamos de hacer:
+
+
+![Demasiado texto](m2.png)
+
+No lo he puesto todo ya que es demasiada información, por lo que dejo solo un troo de la salida.
+
+Ahora lo que haré sera borrar la base de datos tanto de byron como la de zeus, y poder entrar con nuestro usuario root, a ver si nos deja después.
+
+![Borrado de bases](m3.png)
+
+Ahora lo que hago es intentar entrar en una de las que he borrado:
+
+```sql
+use byron;
+
+use zeus;
+```
+
+Y como podemos ver este nos dice que es una base de datos desconocida:
+
+![Desconocido](m4.png)
+
+AHora lo que tenemos que hacer para poder hacer una restauración es usar la copia de seguridad la cual hicimos antes, la que se llama `copia_seguridad-mariadb.sql`, la cual vamos a usar havciendo lo siguiente:
+
+```bash
+sudo mysql -u root -p < backup/copia_seguridad-mariadb.sql
+```
+
+![alt text](m5.png)
+
+Y ahora entramos dentro directamenre de una de las que antes borramos, por ejemlo zeus, por lo que usaremos el siguiente comando:
+
+```bash
+sudo mysql -u root -p zeus 
+```
+
+Y como podemos ver, esta todo totalmente restaurado:
+
+![alt text](m6.png)
+
+Esto tambien podria bien servir a la hora de recuperar usuarios, el cual dejo por aquí un ejemplo:
+
+
+![alt text](m7.png)
+
+Y ahora procedemos a restaurarlo como anterioremnete:
+
+```bash
+sudo mysql -u root -p < backup/copia_seguridad-mariadb.sql
+```
+
+Y lo comprobamos:
+
+![alt text](m8.png)
+
+Y como podemos observar ya esta restaurado.
+
+Tambien como en los casos anteriores podemos hacer una programación de una copia de seguridad diaria, por lo que usaremos al igual que antes `contrab -e`, y tendriamos que poner la siguiente linea en el caso de que lo queramos a las 2 de la mañana:
+
+```bash
+0 2 * * * sudo mysqldump -u root -p --all-databases > backup/copia_seguridad-mariadb_$(date +%Y-%m-%d).sql
+```
+
+Y con esto tendriamos programada las copias de seguridad a diarias y aqu enos saliera con la fecha en la que se hace.
+
+---
+
+# MongoDB
+##  Documenta el empleo de las herramientas de copia de seguridad y restauración de MongoDB.
