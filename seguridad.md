@@ -719,3 +719,63 @@ Y con esto tendriamos programada las copias de seguridad a diarias y aqu enos sa
 
 # MongoDB
 ##  Documenta el empleo de las herramientas de copia de seguridad y restauración de MongoDB.
+
+Para este ejercicio lo que vamos a hacer uso de la herramienta `mongodump` para crear lo que es la copia de seguridad , por lo que vamos a ver en que bases de datos tenemos en nuestro **Mongo**.
+
+![Ver las bases de dtaos qu etenem](mon1.png)
+
+Y voy a hacer una copia de seguridad sobre una base de datos, en este caso usare la de `practicamotos`, ya que es la que tengo especial cariño.
+
+![alt text](mon2.png)
+
+Ya que con esta herramienta lo que hacemos son backup de bases de datos en concreto, por lo que el coamdno será el siguiente:ç
+
+```bash
+mongodump -u andy -p andy --db practicamotos --authenticationDatabase admin --out backups
+```
+
+![alt text](mon3.png)
+
+Esto lo que ha hecho es crear un directorio de copias de seguridad y si entarmos dentro estara la base de datos `practicamotos`, y podemos ver su contenido de la siguiente manera:
+
+```bash 
+bsondump practicamotos/motos.bson | jq
+```
+
+Lo podemos ver a continuación:
+
+![Datos del backup](mon4.png)
+
+Ahora lo que tendremos que hacer es borrar la base de datos, por lo que vamos a entrar en dicha base de datos y borrar las coleciones, y tal.
+
+```sql 
+use practicamotos --O cualquier base de datos que queramos eliminar.
+db.dropDatabase()
+```
+Esto no se verá en el momento, pero ya nop está.
+
+![Borrado de la base de datos](mon5.png)
+
+Ahora que lo he borrado, lo que haremos será restaurarlo con la copia que hicimos con anterioridad, por lo que usare el siguiente comando, el cual tiene que ser usado dentro del directorio de backups:
+
+```bash
+mongorestore -u andy -p andy --db practicamotos --authenticationDatabase admin practicamotos
+```
+
+Y asi lo vemos por pantalla:
+
+![alt text](mon6.png)
+
+Y ahora lo que haremos será entrar en dicha base de datos y comprobarlo.
+
+![alt text](mon7.png)
+
+
+Si observamos esto se ha hecho de escandalo, es decir, la restauración ha sido todo un exito, pero esto como siempre hay cierto margen de mejora, por lo que podemos al igual que las demás herramientas, automatizar este proceso haciendo uso de lo que es `contra -e` para su uso diario.
+
+Por lo que abriendo el editor, lo pondriamos a las dos de la mañana, y se haria de forma automatica, dejo el comando por aqui:
+
+```bash
+0 2 * * * mongodump -u andy -p andy --db practicamotos --authenticationDatabase admin --out backups
+```
+---
