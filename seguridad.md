@@ -488,3 +488,137 @@ Y ahora lo que tendriamos que hacer es una comprobación como antes:
 ![TOOOOOOOOOOP OF THE WORLDDDD](r45.png)
 
 ---
+
+# Ejercicio 6
+
+## Documenta el empleo de las herramientas de copia de seguridad y restauración de Postgres.
+
+Para esta parte al igual que en el anterior caso, lo que haré será una clonación de la máquina de PostgreSQL, y una vez hecho esto, empezaremos a trabajar en este ejercicio.
+
+Lo primero que vamos a hacer es listar las bases de datos que tenemos en este SGBD, para ello nos vamos a valer del comando una vez dentro de postgres.
+
+```bash
+sudo -u postgres psql
+```
+Y una vez dentro listamos las bases de datos:
+
+```sql
+\l
+```
+Y nos ofrece por pantalla lo siguiente:
+
+![Listado de bases](p1.png)
+
+Y también todos los usuarios que tenemos, con el siguiente comando:
+
+```sql
+select * form pg_user;
+```
+Y lo vemos por pantalla:
+
+![alt text](p2.png)
+
+Por lo que vamos a crear una copia de seguridad, pero lo primero que tenemos que hacer es crear el directorio, o más bien ruta, donde queremos que se guarde todo lo relacionado con las copia de seguridad, todo esto lo tenemos qu ehacer siendo usuario postgres.
+
+- Ser usuario postgres.
+
+```bash
+sudo -i -u postgres
+```
+
+- Creación del directorio.
+
+```bash
+sudo mkdir -p /var/lib/postgresql/backup
+```
+
+- Guardado de la copia de seguridad.
+
+```bash
+pg_basebackup -D /var/lib/postgresql/backup
+```
+
+Si lo has hecho como otro usuario cambia los permiso, y el propietario.
+
+![Espartaco](p3.png)
+
+Para restaurarla, será necesario detener el servicio, ya que la restauración se realizará copiando los archivos directamente.
+
+Por lo que dejamos ya el usuario postgresm y nos vamos a nuetsro usuario, y ejecutamos lo siguiente:
+
+```bash
+sudo systemctl stop postgresql
+sudo systemctl ststus postgresql
+```
+
+![Apagao](p4.png)
+
+Ahora borrare todos los ficheros, y le rezamos a dios en los siguientes pasos.
+
+1. Borrado de los ficheros en la siguiente ruta.
+
+```bash
+sudo rm -fr /var/lib/postgresql/15/main/*
+```
+2. Comprobar que lo hemos borrado.
+
+```bash
+sudo ls -l
+```
+![Borrado todo y comprobado](P5.png)
+
+Ahora intentare meterme en la base de datos ydeberia de fallar.
+
+```bash
+sudo -u postgres psql
+```
+
+Y como vemos a continuación no xiste el fichero.
+
+![No entramos](p6.png)
+
+A continuación, copiaremos los archivos desde el directorio donde realizamos el backup y asignaremos los permisos adecuados, incluyendo el cambio de propietario si es necesario.
+
+Por lo que ahora entramos como el usuario postrgres:
+
+```bash
+su postgres
+```
+Y entramos en el directorio backup, y copiamos todos los ficheros, a directorio `/var/lib/postgresql/15/main/`, a continuación dejo los comandos:
+
+```bash
+su postgres
+cd
+cd backup/
+ls
+cp -r * /var/lib/postgresql/15/main/
+ls -l /var/lib/postgresql/15/main/
+```
+
+![Copiaaaao](p7.png)
+
+Una vez hecho esto, lo que tendremos que hacer es iniciar el servicio de postgres y verificar su estad, en mi casdo me sali del usuario postgres, pero lo podeis hacer desde donde querais:
+
+```bash
+sudo systemctl start postgresql
+ sudo systemctl status postgresql
+```
+
+![Encendido esta](p8.png)
+
+Ahora lo que vamos a hacer es coger y entrar y ver que esten las bases de datos, con sus usuario y demas.
+
+![Listo calisto](p9.png)
+
+COmo vimos en Oracle en esta misma práctica, podemos programar lo que es la copia de seguirdad con la herramienta **contrab -e**, ya que es más útil.
+
+Por lo que si queremos hacer una copia a las dos de la mañana tendremos que añadir al fichero la siguiente linea:
+
+```bash
+
+0 2 * * * pg_basebackup -D /var/lib/postgresql/backup
+```
+
+Y con esto ya estaría este ejercicio.
+
+---
