@@ -1,5 +1,5 @@
 # Movimiento de datos
-
+![POrtales](portales.jpg)
 ## Introducción 
 
 Los sistemas de gestión de bases de datos (SGBD) permiten almacenar y administrar grandes volúmenes de datos de manera eficiente. Es crucial que los administradores conozcan las herramientas para importar y exportar datos, así como sus distintas opciones. 
