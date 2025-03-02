@@ -473,6 +473,211 @@ Pero para asegurarnos lo que vamos a hacer es entrar en la base de datos de `pra
 
 ### SQL*Loader es una herramienta que sirve para cargar grandes volúmenes de datos en una instancia de ORACLE. Exportad los datos de una base de datos completa desde MariaDB a texto plano con delimitadores y emplead SQL*Loader para realizar el proceso de carga de dichos datos a una instancia ORACLE. Debéis documentar todo el proceso, explicando los distintos ficheros de configuración y de log que tiene SQL*Loader.
 
+Este ejercicio pide el SGBD MariaDB, yo haré tanto este como el SGBD Postgres, ya que me parecen ambos un poco diferentes según he visto en lo que va a la hora de la escritura de las bases, por lo que me voy a tomar el lujo de empezar por MariaDB, y acabar por Postgres.
+
+#### - MariaDB
+
+
+Por lo que voy a empezar con ello, dejaremos los pasos, por aquí.
+
+### Ejercicio 1
+
+Estos pasos los voy a hacer en el **SGBD relacional MariaDB**.
+
+1. Entrar en nuestro sistema:
+
+```bash
+sudo mysql -u root 
+```
+2. Crear la base de datos en la que vamos a trabajar.
+
+```sql
+CREATE DATABASE empresa;
+```
+3. Usar dicha base y meter la tabla y sus inserciones:
+```sql
+use empresa;
+
+CREATE TABLE empleados (
+    nombre VARCHAR(100),
+    edad INT,
+    fecha_ingreso DATE
+);
+
+-- Insertar algunos registros de ejemplo
+INSERT INTO empleados (nombre, edad, fecha_ingreso) VALUES 
+('Carlos Pérez', 30, '2022-06-15'),
+('Ana Gómez', 25, '2021-04-10'),
+('Luis Rodríguez', 40, '2019-09-23');
+```
+
+4. Ahora lo que hacemos es lo siguiente en forma de consulta:
+
+```sql
+SELECT * 
+INTO OUTFILE '/tmp/empleados.csv'
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+FROM empleados;
+```
+
+Luego lo que hacemos es pasarlo a nuestro SGBD Oracle, por lo que nos basaremos en el comando scp.
+
+![Espectaculo](mairana.png)
+
+Ahora nos vamos a nuetsro **SGBD Oracle**, y hacemos lo siguiente:
+
+1. Crear el usuario y la tabla donde lo vamos a alojar.
+
+```sql
+sqlplus / as sysdba
+STARTUP;
+
+--Creacion de usuario y sus permisos
+
+CREATE USER C###LOKI IDENTIFIED BY LOKI;
+GRANT CONNECT, RESOURCE TO C###LOKI;
+GRANT UNLIMITED TABLESPACE TO C###LOKI;
+ALTER USER C###LOKI QUOTA UNLIMITED ON USERS;
+
+-- Creacion de tabla mi rey.
+
+CREATE TABLE empleados_oracle (
+    nombre VARCHAR2(100),
+    edad NUMBER(3),
+    fecha_ingreso DATE
+);
+```
+
+Nos desconectamos y vemos donde nos pasamos, de normal en el siguiente directorio `/home/oracle`, cuando nos pasemos el archivo con extensión `.csv`, tendremos que hacer en fichero de control, el cual es extensión `.ctl`.
+
+El cual tendra el siguiente formato:
+
+```bash
+LOAD DATA
+INFILE '/tmp/empleados.csv' //Donde se encuentre el fichero .csv
+INTO TABLE empleados_oracle // a donde va dirigido.
+
+FIELDS TERMINATED BY ';'
+OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    nombre,
+    edad,
+    fecha_ingreso DATE "YYYY-MM-DD"
+)
+```
+
+Y luego de esto lo que tenemos que hacer es cargar los datos, por lo que al igual que con postgres, lo que haremos será el uso del siguiente comando:
+
+```bash
+sqlldr C###LOKI/LOKI control=/home/oracle/nuevos_empleados.ctl log=/home/oracle/nuevos_empleados.log
+```
+
+- El fichero .ctl tiene ese nombre, porque tenia otro con el mimso nombre.
+
+Y con esto funconaria, si da algún problema es que estará apagado Oracle, por lo que entrais como `SYSDBA` e iniciais la base de dtoas, y volveis a crear la tabla en el usuario.
+
+Y ya estaria.
+
+### Ejercicio 2
+
+Voy a hacer lo mimso que el ejercicio 3, pero esta vez con decimales, por lo que como forofo del mundo del motor, lo que hare será una tabla de motos.
+
+1. Entrar en nuestro sistema:
+
+```bash
+sudo mysql -u root 
+```
+2. Crear la base de datos en la que vamos a trabajar.
+
+```sql
+CREATE DATABASE motor_db;;
+```
+3. Usar dicha base y meter la tabla y sus inserciones:
+```sql
+use motor_db;
+
+CREATE TABLE motos (
+    modelo VARCHAR(50),           
+    precio DECIMAL(10, 2),       
+    fecha_fabricacion DATE        
+);
+
+-- Insertar algunos registros de ejemplo
+INSERT INTO motos (modelo, precio, fecha_fabricacion) VALUES
+('Harley Davidson Sportster', 8999.99, '2022-05-15'),
+('Yamaha YZF-R3', 4999.50, '2021-08-10'),
+('Kawasaki Ninja 400', 5799.99, '2022-03-22'),
+('BMW S1000RR', 18999.99, '2023-01-30');
+```
+
+4. Ahora lo que hacemos es lo siguiente en forma de consulta:
+
+```sql
+SELECT * 
+INTO OUTFILE '/tmp/motos.csv' 
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\n'
+FROM motos;
+```
+
+Y comprobamos que esta en el directorio:
+
+![alt text](marianan.png)
+
+Ahora nos lo pasamos a nuestro SGBD Oracle, a través de SCP.
+
+![alt text](mariano.png)
+
+
+Y ahora si que si entramos en juego en SGBD Oracle.
+
+Vamos a usar el mismo usuario `C###LOKI`.
+
+Por lo que ahroa vamos a crear la tabla:
+
+```sql
+CREATE TABLE motos (
+    modelo VARCHAR2(50),          
+    precio NUMBER(10, 2),         
+    fecha_fabricacion DATE       
+);
+```
+
+Luego de esto tendremos que hacer el fichero `.ctl`, que quedaria asi:
+
+```bash
+
+oracle@madand1:~$ cat motos.ctl 
+LOAD DATA
+INFILE '/home/oracle/motos.csv'
+INTO TABLE motos
+FIELDS TERMINATED BY ';'
+OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    modelo,
+    precio DECIMAL EXTERNAL,
+    fecha_fabricacion DATE "YYYY-MM-DD"
+)
+```
+
+Si lo cargamos tal como esta el .csv, este dará fallo, por lo que tendremos que cambiar los puntos pos la comas, y entonces saldra bien.
+
+
+![alt text](mariaaaaaaaaaaaaaaanooo.png)
+
+Y si entramos veremos como esta todo ready to fitgh.
+
+![alt text](VAAAAAAAAAAAAAAAAAAAAAAAAMMOOOO.png)
+
+Y con esto ya estaria.
+
+
+#### - PostgreSQL
 
 Para este ejercicio voy a utiliza la base de datos llamada **byron** que la tenemos en nuestro SGBD PostgreSQL.
 
@@ -722,6 +927,10 @@ Y como podemos observar se ha importado todo perfectamente.
 
 ## Bonustrack
 
+Como me di cuenta tarde, de que los decimales, son distintos en lo que va de los SGBD Oracle con respecto MariaDB, y PostgreSQL, he decidido hacer tambien dos ejemplos, aunque el primero que hice puede que sobre, ya que no tiene decimales, pero si que me parece algo bueno de ver, que son los delimitadores, en mi caso uso (,).
+
+Por lo que aqui dejo lo siguiente:
+
 ### Ejercicio 1
 
 Como lo estoy haciendo con las tablas que ya tenia hechas, lo que voy a realizar es un ejercicio donde en Postgres, voy a crear una base de datos, y metere alguna tabla, con inserciones, y lo voy a volver a meter en lo que es Oracle, gracias al SQL*Loader.
@@ -944,203 +1153,3 @@ Y con esto ya sabriamos hacer la importacion usando la herramienta que nos propo
 Espero que os haya servido, y por si algún dia decaeis, redordar, **el que pierde es el que se rinde**.
 
 ---
-
-### Ejercicio 3
-
-En este ejercicio voy a hacerlo con MariaDB, que esto no lo hemos visto en la práctica entonces lo que haremos será un ejemplo tonto para tener una ligera idea de como va la historia.
-
-Por lo que voy a empezar con ello, dejaremos los pasos, por aquí.
-
-Estos pasos los voy a hacer en el **SGBD relacional MariaDB**.
-
-1. Entrar en nuestro sistema:
-
-```bash
-sudo mysql -u root 
-```
-2. Crear la base de datos en la que vamos a trabajar.
-
-```sql
-CREATE DATABASE empresa;
-```
-3. Usar dicha base y meter la tabla y sus inserciones:
-```sql
-use empresa;
-
-CREATE TABLE empleados (
-    nombre VARCHAR(100),
-    edad INT,
-    fecha_ingreso DATE
-);
-
--- Insertar algunos registros de ejemplo
-INSERT INTO empleados (nombre, edad, fecha_ingreso) VALUES 
-('Carlos Pérez', 30, '2022-06-15'),
-('Ana Gómez', 25, '2021-04-10'),
-('Luis Rodríguez', 40, '2019-09-23');
-```
-
-4. Ahora lo que hacemos es lo siguiente en forma de consulta:
-
-```sql
-SELECT * 
-INTO OUTFILE '/tmp/empleados.csv'
-FIELDS TERMINATED BY ';'
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-FROM empleados;
-```
-
-Luego lo que hacemos es pasarlo a nuestro SGBD Oracle, por lo que nos basaremos en el comando scp.
-
-![Espectaculo](mairana.png)
-
-Ahora nos vamos a nuetsro **SGBD Oracle**, y hacemos lo siguiente:
-
-1. Crear el usuario y la tabla donde lo vamos a alojar.
-
-```sql
-sqlplus / as sysdba
-STARTUP;
-
---Creacion de usuario y sus permisos
-
-CREATE USER C###LOKI IDENTIFIED BY LOKI;
-GRANT CONNECT, RESOURCE TO C###LOKI;
-GRANT UNLIMITED TABLESPACE TO C###LOKI;
-ALTER USER C###LOKI QUOTA UNLIMITED ON USERS;
-
--- Creacion de tabla mi rey.
-
-CREATE TABLE empleados_oracle (
-    nombre VARCHAR2(100),
-    edad NUMBER(3),
-    fecha_ingreso DATE
-);
-```
-
-Nos desconectamos y vemos donde nos pasamos, de normal en el siguiente directorio `/home/oracle`, cuando nos pasemos el archivo con extensión `.csv`, tendremos que hacer en fichero de control, el cual es extensión `.ctl`.
-
-El cual tendra el siguiente formato:
-
-```bash
-LOAD DATA
-INFILE '/tmp/empleados.csv' //Donde se encuentre el fichero .csv
-INTO TABLE empleados_oracle // a donde va dirigido.
-
-FIELDS TERMINATED BY ';'
-OPTIONALLY ENCLOSED BY '"'
-TRAILING NULLCOLS
-(
-    nombre,
-    edad,
-    fecha_ingreso DATE "YYYY-MM-DD"
-)
-```
-
-Y luego de esto lo que tenemos que hacer es cargar los datos, por lo que al igual que con postgres, lo que haremos será el uso del siguiente comando:
-
-```bash
-sqlldr C###LOKI/LOKI control=/home/oracle/nuevos_empleados.ctl log=/home/oracle/nuevos_empleados.log
-```
-
-- El fichero .ctl tiene ese nombre, porque tenia otro con el mimso nombre.
-
-Y con esto funconaria, si da algún problema es que estará apagado Oracle, por lo que entrais como `SYSDBA` e iniciais la base de dtoas, y volveis a crear la tabla en el usuario.
-
-Y ya estaria.
-
-### Ejercicio 4
-
-Voy a hacer lo mimso que el ejercicio 3, pero esta vez con decimales, por lo que como forofo del mundo del motor, lo que hare será una tabla de motos.
-
-1. Entrar en nuestro sistema:
-
-```bash
-sudo mysql -u root 
-```
-2. Crear la base de datos en la que vamos a trabajar.
-
-```sql
-CREATE DATABASE motor_db;;
-```
-3. Usar dicha base y meter la tabla y sus inserciones:
-```sql
-use motor_db;
-
-CREATE TABLE motos (
-    modelo VARCHAR(50),           
-    precio DECIMAL(10, 2),       
-    fecha_fabricacion DATE        
-);
-
--- Insertar algunos registros de ejemplo
-INSERT INTO motos (modelo, precio, fecha_fabricacion) VALUES
-('Harley Davidson Sportster', 8999.99, '2022-05-15'),
-('Yamaha YZF-R3', 4999.50, '2021-08-10'),
-('Kawasaki Ninja 400', 5799.99, '2022-03-22'),
-('BMW S1000RR', 18999.99, '2023-01-30');
-```
-
-4. Ahora lo que hacemos es lo siguiente en forma de consulta:
-
-```sql
-SELECT * 
-INTO OUTFILE '/tmp/motos.csv' 
-FIELDS TERMINATED BY ';' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n'
-FROM motos;
-```
-
-Y comprobamos que esta en el directorio:
-
-![alt text](marianan.png)
-
-Ahora nos lo pasamos a nuestro SGBD Oracle, a través de SCP.
-
-![alt text](mariano.png)
-
-
-Y ahora si que si entramos en juego en SGBD Oracle.
-
-Vamos a usar el mismo usuario `C###LOKI`.
-
-Por lo que ahroa vamos a crear la tabla:
-
-```sql
-CREATE TABLE motos (
-    modelo VARCHAR2(50),          
-    precio NUMBER(10, 2),         
-    fecha_fabricacion DATE       
-);
-```
-
-Luego de esto tendremos que hacer el fichero `.ctl`, que quedaria asi:
-
-```bash
-
-oracle@madand1:~$ cat motos.ctl 
-LOAD DATA
-INFILE '/home/oracle/motos.csv'
-INTO TABLE motos
-FIELDS TERMINATED BY ';'
-OPTIONALLY ENCLOSED BY '"'
-TRAILING NULLCOLS
-(
-    modelo,
-    precio DECIMAL EXTERNAL,
-    fecha_fabricacion DATE "YYYY-MM-DD"
-)
-```
-
-Si lo cargamos tal como esta el .csv, este dará fallo, por lo que tendremos que cambiar los puntos pos la comas, y entonces saldra bien.
-
-
-![alt text](mariaaaaaaaaaaaaaaanooo.png)
-
-Y si entramos veremos como esta todo ready to fitgh.
-
-![alt text](VAAAAAAAAAAAAAAAAAAAAAAAAMMOOOO.png)
-
-Y con esto ya estaria.
