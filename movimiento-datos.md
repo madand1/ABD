@@ -531,6 +531,7 @@ Donde:
 - `LINES TERMINATED BY '\n'` → Cada fila termina con un salto de línea.
 - `FROM motos;` → Especifica la tabla motos como fuente de los datos.
 
+También he usado esto, ya que en Mariadb, no puedo usar funciones por lo que hay que meterlo a mano, y hacerlo con una consulta me ha resultado mucho más sencillo que hacerlo a través de un script.
 
 Y comprobamos que esta en el directorio:
 
@@ -741,6 +742,8 @@ CREATE OR REPLACE FUNCTION export_csv(name_tab TEXT, ruta TEXT)
 ```
 
 Esta función es genérica, por lo que nos va a valer para **TODAS** las bases de datos, ya que la función la tendremos que ejecutar con el siguiente comando, indicando el nombre de la base de datos, y la ruta donde la queremos.
+
+He usado una función en POstgres, ya que **SI SE PUEDE**, hacer lo que es un función, por lo que hice estam, ahora bien, tanto en esto como en MariaDB se puede cambair el delimitador.
 
 ```sql
 SELECT export_csv('byron', '/home/andy/' );
