@@ -1,5 +1,7 @@
 # Auditoría de bases de datos
 
+![aUDITOraaaaaaa](auditoRAAARRRR.jpeg)
+
 Lo primero antes de empezar esta práctica es saber que es una auditoria, obviamente en el ambito de bases de datos, por lo que voy a proceder a hacer una definición:
 
 ## Definición de auditoría:
