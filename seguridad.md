@@ -1,5 +1,9 @@
 # Copias de seguridad y restauración.
 
+![Back](back-to-future.webp)
+
+La copias de seguridad, o backups, son de lo más útil, ya que si pasa algo en una base de dtaos, tenemos un técnico que ha borrado algo y no queria, podemos hacer una restauracioón, por lo que a continuación muetsro como hacerlo en los SGBD tantl relacionales, como no relacional en este caso MOngoDB, así que sin más preambuelo empecemos.
+
 ---
 # Oracle
 ---
