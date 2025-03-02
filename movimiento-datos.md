@@ -49,12 +49,12 @@ Una vez que tenemos esto, podemos seguir con la finalidad de dicha práctica.
 ---
 ## Ejercicio 1
 
-Realiza una exportación del esquema de C###BYRON usando Oracle Data Pump con las siguientes condiciones:
-• Exporta tanto la estructura de las tablas como los datos de las mismas.
-• Excluye la tabla BONUS y los departamentos con menos de dos empleados.
-• Realiza una estimación previa del tamaño necesario para el fichero de exportación.
-• Programa la operación para dentro de 2 minutos.
-• Genera un archivo de log en el directorio raíz.
+### Realiza una exportación del esquema de C###BYRON usando Oracle Data Pump con las siguientes condiciones:
+#### • Exporta tanto la estructura de las tablas como los datos de las mismas.
+#### • Excluye la tabla BONUS y los departamentos con menos de dos empleados.
+#### • Realiza una estimación previa del tamaño necesario para el fichero de exportación.
+#### • Programa la operación para dentro de 2 minutos.
+#### • Genera un archivo de log en el directorio raíz.
 
 Antes de poder realizar una exportación, lo que debemos de hacer es concederle al dueño de la bade de datos los permisos pertinentes para dicha exportación.
 
