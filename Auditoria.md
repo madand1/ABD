@@ -3459,3 +3459,13 @@ Donde nos esta dando la fecha y hora, el nivel de informacion, el componente log
 - [Errores más comunes de Oracle](https://orasite.com/errores)
 - [Auditoria Mongo](https://www.mongodb.com/docs/manual/reference/database-profiler/)
 - [Cassandra](https://cassandra.apache.org/doc/stable/cassandra/operating/audit_logging.html)
+
+---
+
+# Área de descanso del aventurero.
+
+Después de todo este camino, espero que hayais tenido un gran viaje, asi que [descansa viajero](https://www.youtube.com/watch?v=1Sq4cD5ib2U&ab_channel=ChillCartoonVibes)
+
+**¡Buena suerte, aventurero!** 🚀🗺️⚔️
+
+![Descanso](ds.gif)

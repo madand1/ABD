@@ -1185,3 +1185,11 @@ Y con esto ya sabriamos hacer la importacion usando la herramienta que nos propo
 Espero que os haya servido, y por si algún dia decaeis, redordar, **el que pierde es el que se rinde**.
 
 ---
+
+# Área de descanso del aventurero.
+
+Después de todo este camino, espero que hayais tenido un gran viaje, asi que [descansa viajero](https://www.youtube.com/watch?v=1Sq4cD5ib2U&ab_channel=ChillCartoonVibes)
+
+**¡Buena suerte, aventurero!** 🚀🗺️⚔️
+
+![Descanso](ds.gif)

@@ -783,3 +783,11 @@ Por lo que abriendo el editor, lo pondriamos a las dos de la mañana, y se haria
 0 2 * * * mongodump -u andy -p andy --db practicamotos --authenticationDatabase admin --out backups
 ```
 ---
+
+# Área de descanso del aventurero.
+
+Después de todo este camino, espero que hayais tenido un gran viaje, asi que [descansa viajero](https://www.youtube.com/watch?v=1Sq4cD5ib2U&ab_channel=ChillCartoonVibes)
+
+**¡Buena suerte, aventurero!** 🚀🗺️⚔️
+
+![Descanso](ds.gif)
