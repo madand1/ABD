@@ -676,6 +676,7 @@ Y si entramos veremos como esta todo ready to fitgh.
 
 Y con esto ya estaria.
 
+## Bonustrack
 
 #### - PostgreSQL
 
@@ -925,7 +926,7 @@ Por lo que ahora iremos con las comprobaciones de que se importaron bien las dem
 
 Y como podemos observar se ha importado todo perfectamente.
 
-## Bonustrack
+---
 
 Como me di cuenta tarde, de que los decimales, son distintos en lo que va de los SGBD Oracle con respecto MariaDB, y PostgreSQL, he decidido hacer tambien dos ejemplos, aunque el primero que hice puede que sobre, ya que no tiene decimales, pero si que me parece algo bueno de ver, que son los delimitadores, en mi caso uso (,).
 
