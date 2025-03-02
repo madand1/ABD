@@ -478,9 +478,123 @@ Este ejercicio pide el SGBD MariaDB, yo haré tanto este como el SGBD Postgres, 
 #### - MariaDB
 
 
-Por lo que voy a empezar con ello, dejaremos los pasos, por aquí.
+Por lo que voy a empezar con ello, dejaremos los pasos, por aquí, hares dos ejercicios, uno con decimales y otro sin decimales.
 
 ### Ejercicio 1
+
+Ejercicio con decimales, como forofo del mundo del motor, lo que hare será una tabla de motos.
+
+1. Entrar en nuestro sistema:
+
+```bash
+sudo mysql -u root 
+```
+2. Crear la base de datos en la que vamos a trabajar.
+
+```sql
+CREATE DATABASE motor_db;;
+```
+3. Usar dicha base y meter la tabla y sus inserciones:
+```sql
+use motor_db;
+
+CREATE TABLE motos (
+    modelo VARCHAR(50),           
+    precio DECIMAL(10, 2),       
+    fecha_fabricacion DATE        
+);
+
+-- Insertar algunos registros de ejemplo
+INSERT INTO motos (modelo, precio, fecha_fabricacion) VALUES
+('Harley Davidson Sportster', 8999.99, '2022-05-15'),
+('Yamaha YZF-R3', 4999.50, '2021-08-10'),
+('Kawasaki Ninja 400', 5799.99, '2022-03-22'),
+('BMW S1000RR', 18999.99, '2023-01-30');
+```
+
+4. Ahora lo que hacemos es lo siguiente en forma de consulta:
+
+```sql
+SELECT * 
+INTO OUTFILE '/tmp/motos.csv' 
+FIELDS TERMINATED BY ';' 
+ENCLOSED BY '"' 
+LINES TERMINATED BY '\n'
+FROM motos;
+```
+Donde:
+
+- `SELECT *` → Selecciona todos los registros de la tabla motos.
+- `INTO OUTFILE '/tmp/motos.csv'` → Guarda los resultados en /tmp/motos.csv.
+- `FIELDS TERMINATED BY ';'` → Separa los valores con ;.
+- `ENCLOSED BY '"'` → Encierra los valores entre " para manejar espacios o caracteres especiales.
+- `LINES TERMINATED BY '\n'` → Cada fila termina con un salto de línea.
+- `FROM motos;` → Especifica la tabla motos como fuente de los datos.
+
+
+Y comprobamos que esta en el directorio:
+
+![alt text](marianan.png)
+
+Ahora nos lo pasamos a nuestro SGBD Oracle, a través de SCP.
+
+![alt text](mariano.png)
+
+
+Y ahora si que si entramos en juego en SGBD Oracle.
+
+Vamos a usar el mismo usuario `C###LOKI`.
+
+Por lo que ahroa vamos a crear la tabla:
+
+```sql
+CREATE TABLE motos (
+    modelo VARCHAR2(50),          
+    precio NUMBER(10, 2),         
+    fecha_fabricacion DATE       
+);
+```
+
+Luego de esto tendremos que hacer el fichero `.ctl`, que quedaria asi:
+
+```bash
+
+oracle@madand1:~$ cat motos.ctl 
+LOAD DATA
+INFILE '/home/oracle/motos.csv'
+INTO TABLE motos
+FIELDS TERMINATED BY ';'
+OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(
+    modelo,
+    precio DECIMAL EXTERNAL,
+    fecha_fabricacion DATE "YYYY-MM-DD"
+)
+```
+Donde:
+
+- `FIELDS TERMINATED BY ';'` → Los valores están separados por ;.
+- `OPTIONALLY ENCLOSED BY '"'` → Los valores pueden estar entre " (opcionalmente).
+- `TRAILING NULLCOLS` → Si un campo está vacío en el archivo, se inserta como NULL.
+- `precio DECIMAL EXTERNAL` → Convierte el valor de precio desde texto a decimal.
+- `fecha_fabricacion DATE "YYYY-MM-DD"` → Interpreta las fechas en formato "YYYY-MM-DD".
+
+Si lo cargamos tal como esta el .csv, este dará fallo, por lo que tendremos que cambiar los puntos pos la comas, y entonces saldra bien.
+
+
+![alt text](mariaaaaaaaaaaaaaaanooo.png)
+
+Y si entramos veremos como esta todo ready to fitgh.
+
+![alt text](VAAAAAAAAAAAAAAAAAAAAAAAAMMOOOO.png)
+
+Y con esto ya estaria.
+
+
+### Ejercicio 2
+
+Para este ejercicio voy a crear una tabla de empleados, basandome en la de Scott, y sin decimales.
 
 Estos pasos los voy a hacer en el **SGBD relacional MariaDB**.
 
@@ -521,6 +635,15 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 FROM empleados;
 ```
+Donde:
+
+- `SELECT *` → Selecciona todos los registros de la tabla empleados.
+- `INTO OUTFILE '/tmp/empleados.csv'` → Guarda los resultados en /tmp/empleados.csv.
+- `FIELDS TERMINATED BY ';'` → Separa los valores con ;.
+- `ENCLOSED BY '"'` → Encierra los valores entre " para manejar espacios o caracteres especiales.
+- `LINES TERMINATED BY '\n'` → Cada fila termina con un salto de línea.
+- `FROM empleados;` → Especifica la tabla empleados como fuente de los datos.
+
 
 Luego lo que hacemos es pasarlo a nuestro SGBD Oracle, por lo que nos basaremos en el comando scp.
 
@@ -575,106 +698,11 @@ Y luego de esto lo que tenemos que hacer es cargar los datos, por lo que al igua
 sqlldr C###LOKI/LOKI control=/home/oracle/nuevos_empleados.ctl log=/home/oracle/nuevos_empleados.log
 ```
 
-- El fichero .ctl tiene ese nombre, porque tenia otro con el mimso nombre.
+- El fichero .ctl tiene ese nombre, porque tenia otro con el mismo nombre.
 
 Y con esto funconaria, si da algún problema es que estará apagado Oracle, por lo que entrais como `SYSDBA` e iniciais la base de dtoas, y volveis a crear la tabla en el usuario.
 
 Y ya estaria.
-
-### Ejercicio 2
-
-Voy a hacer lo mimso que el ejercicio 3, pero esta vez con decimales, por lo que como forofo del mundo del motor, lo que hare será una tabla de motos.
-
-1. Entrar en nuestro sistema:
-
-```bash
-sudo mysql -u root 
-```
-2. Crear la base de datos en la que vamos a trabajar.
-
-```sql
-CREATE DATABASE motor_db;;
-```
-3. Usar dicha base y meter la tabla y sus inserciones:
-```sql
-use motor_db;
-
-CREATE TABLE motos (
-    modelo VARCHAR(50),           
-    precio DECIMAL(10, 2),       
-    fecha_fabricacion DATE        
-);
-
--- Insertar algunos registros de ejemplo
-INSERT INTO motos (modelo, precio, fecha_fabricacion) VALUES
-('Harley Davidson Sportster', 8999.99, '2022-05-15'),
-('Yamaha YZF-R3', 4999.50, '2021-08-10'),
-('Kawasaki Ninja 400', 5799.99, '2022-03-22'),
-('BMW S1000RR', 18999.99, '2023-01-30');
-```
-
-4. Ahora lo que hacemos es lo siguiente en forma de consulta:
-
-```sql
-SELECT * 
-INTO OUTFILE '/tmp/motos.csv' 
-FIELDS TERMINATED BY ';' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n'
-FROM motos;
-```
-
-Y comprobamos que esta en el directorio:
-
-![alt text](marianan.png)
-
-Ahora nos lo pasamos a nuestro SGBD Oracle, a través de SCP.
-
-![alt text](mariano.png)
-
-
-Y ahora si que si entramos en juego en SGBD Oracle.
-
-Vamos a usar el mismo usuario `C###LOKI`.
-
-Por lo que ahroa vamos a crear la tabla:
-
-```sql
-CREATE TABLE motos (
-    modelo VARCHAR2(50),          
-    precio NUMBER(10, 2),         
-    fecha_fabricacion DATE       
-);
-```
-
-Luego de esto tendremos que hacer el fichero `.ctl`, que quedaria asi:
-
-```bash
-
-oracle@madand1:~$ cat motos.ctl 
-LOAD DATA
-INFILE '/home/oracle/motos.csv'
-INTO TABLE motos
-FIELDS TERMINATED BY ';'
-OPTIONALLY ENCLOSED BY '"'
-TRAILING NULLCOLS
-(
-    modelo,
-    precio DECIMAL EXTERNAL,
-    fecha_fabricacion DATE "YYYY-MM-DD"
-)
-```
-
-Si lo cargamos tal como esta el .csv, este dará fallo, por lo que tendremos que cambiar los puntos pos la comas, y entonces saldra bien.
-
-
-![alt text](mariaaaaaaaaaaaaaaanooo.png)
-
-Y si entramos veremos como esta todo ready to fitgh.
-
-![alt text](VAAAAAAAAAAAAAAAAAAAAAAAAMMOOOO.png)
-
-Y con esto ya estaria.
 
 ## Bonustrack
 
